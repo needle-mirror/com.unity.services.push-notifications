@@ -1,0 +1,11 @@
+{
+    "name": "Unity.Services.PushNotifications.Tests",
+    "references": [
+        "Unity.Services.PushNotifications"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

@@ -44,7 +44,6 @@ class PushNotificationAnalyticsTests
         Dictionary<string, object> calledParams = m_MockEventWrapper.LastCalledParams;
         Assert.AreEqual(MockPlatformWrapper.mockApplicationVersion, calledParams["clientVersion"]);
         Assert.AreEqual(MockPlatformWrapper.mockAnalyticsPlatform, calledParams["platform"]);
-        Assert.AreEqual(MockPlatformWrapper.mockUserCountry, calledParams["userCountry"]);
         Assert.AreEqual(SdkVersion.SDK_VERSION, calledParams["sdkVersion"]);
         Assert.AreEqual("com.unity.services.pushNotifications.PushNotificationsAnalytics.RecordPushTokenUpdated", calledParams["sdkMethod"]);
         Assert.AreEqual(token, calledParams["pushNotificationToken"]);
@@ -64,7 +63,6 @@ class PushNotificationAnalyticsTests
         Dictionary<string, object> calledParams = m_MockEventWrapper.LastCalledParams;
         Assert.AreEqual(MockPlatformWrapper.mockApplicationVersion, calledParams["clientVersion"]);
         Assert.AreEqual(MockPlatformWrapper.mockAnalyticsPlatform, calledParams["platform"]);
-        Assert.AreEqual(MockPlatformWrapper.mockUserCountry, calledParams["userCountry"]);
         Assert.AreEqual(SdkVersion.SDK_VERSION, calledParams["sdkVersion"]);
         Assert.AreEqual("com.unity.services.pushNotifications.PushNotificationsAnalytics.RecordPushTokenUpdated", calledParams["sdkMethod"]);
         Assert.AreEqual(token, calledParams["pushNotificationToken"]);
@@ -84,7 +82,6 @@ class PushNotificationAnalyticsTests
         Dictionary<string, object> calledParams = m_MockEventWrapper.LastCalledParams;
         Assert.AreEqual(MockPlatformWrapper.mockApplicationVersion, calledParams["clientVersion"]);
         Assert.AreEqual(MockPlatformWrapper.mockAnalyticsPlatform, calledParams["platform"]);
-        Assert.AreEqual(MockPlatformWrapper.mockUserCountry, calledParams["userCountry"]);
         Assert.AreEqual(SdkVersion.SDK_VERSION, calledParams["sdkVersion"]);
         Assert.AreEqual("com.unity.services.pushNotifications.PushNotificationsAnalytics.RecordPushTokenUpdated", calledParams["sdkMethod"]);
         Assert.AreEqual(token, calledParams["androidRegistrationID"]);
@@ -101,7 +98,6 @@ class PushNotificationAnalyticsTests
         Dictionary<string, object> calledParams = m_MockEventWrapper.LastCalledParams;
         Assert.AreEqual(MockPlatformWrapper.mockApplicationVersion, calledParams["clientVersion"]);
         Assert.AreEqual(MockPlatformWrapper.mockAnalyticsPlatform, calledParams["platform"]);
-        Assert.AreEqual(MockPlatformWrapper.mockUserCountry, calledParams["userCountry"]);
         Assert.AreEqual(SdkVersion.SDK_VERSION, calledParams["sdkVersion"]);
         Assert.AreEqual("com.unity.services.pushNotifications.PushNotificationsAnalytics.RecordNotificationOpened", calledParams["sdkMethod"]);
         Assert.AreEqual(true, calledParams["notificationLaunch"]);
@@ -125,7 +121,6 @@ class PushNotificationAnalyticsTests
         Dictionary<string, object> calledParams = m_MockEventWrapper.LastCalledParams;
         Assert.AreEqual(MockPlatformWrapper.mockApplicationVersion, calledParams["clientVersion"]);
         Assert.AreEqual(MockPlatformWrapper.mockAnalyticsPlatform, calledParams["platform"]);
-        Assert.AreEqual(MockPlatformWrapper.mockUserCountry, calledParams["userCountry"]);
         Assert.AreEqual(SdkVersion.SDK_VERSION, calledParams["sdkVersion"]);
         Assert.AreEqual("com.unity.services.pushNotifications.PushNotificationsAnalytics.RecordNotificationOpened", calledParams["sdkMethod"]);
         Assert.AreEqual(true, calledParams["notificationLaunch"]);
@@ -143,7 +138,6 @@ class PushNotificationAnalyticsTests
         Dictionary<string, object> calledParams = m_MockEventWrapper.LastCalledParams;
         Assert.AreEqual(MockPlatformWrapper.mockApplicationVersion, calledParams["clientVersion"]);
         Assert.AreEqual(MockPlatformWrapper.mockAnalyticsPlatform, calledParams["platform"]);
-        Assert.AreEqual(MockPlatformWrapper.mockUserCountry, calledParams["userCountry"]);
         Assert.AreEqual(SdkVersion.SDK_VERSION, calledParams["sdkVersion"]);
         Assert.AreEqual("com.unity.services.pushNotifications.PushNotificationsAnalytics.RecordNotificationOpened", calledParams["sdkMethod"]);
         Assert.AreEqual(false, calledParams.ContainsValue("notificationLaunch"));

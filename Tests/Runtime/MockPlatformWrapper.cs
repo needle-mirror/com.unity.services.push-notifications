@@ -7,7 +7,6 @@ namespace Unity.Services.PushNotifications.Tests
         public const string mockApplicationVersion = "1.0.0";
         public RuntimePlatform mockRuntimePlatform = UnityEngine.RuntimePlatform.Android;
         public const string mockAnalyticsPlatform = "IPHONE";
-        public const string mockUserCountry = "UK";
         public bool mockIsApplicationFocused = true;
 
         public string ApplicationVersion()
@@ -23,11 +22,6 @@ namespace Unity.Services.PushNotifications.Tests
         public string AnalyticsPlatform()
         {
             return mockAnalyticsPlatform;
-        }
-
-        public string UserCountry()
-        {
-            return mockUserCountry;
         }
 
         public bool IsApplicationFocused()

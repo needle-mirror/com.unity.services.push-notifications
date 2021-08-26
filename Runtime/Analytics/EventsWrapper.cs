@@ -19,6 +19,8 @@ namespace Unity.Services.PushNotifications
             {
                 evt.Parameters.Set(parameter.Key, parameter.Value);
             }
+            
+            evt.Parameters.AddUserCountry();
 
             Events.Buffer.PushEvent(evt);
         }

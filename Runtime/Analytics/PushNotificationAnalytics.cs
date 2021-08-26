@@ -7,7 +7,7 @@ namespace Unity.Services.PushNotifications
     static class SdkVersion
     {
         // This value should always match what is in the package.json for this package
-        public static readonly string SDK_VERSION = "1.0.0-pre.2";
+        public static readonly string SDK_VERSION = "1.0.0-pre.4";
     }
 
     interface IPushNotificationsAnalytics
@@ -41,8 +41,7 @@ namespace Unity.Services.PushNotifications
                 { "clientVersion", m_AnalyticsPlatformWrapper.ApplicationVersion() },
                 { "sdkVersion", SdkVersion.SDK_VERSION },
                 { "sdkMethod", "com.unity.services.pushNotifications.PushNotificationsAnalytics.RecordPushTokenUpdated" },
-                { "platform", m_AnalyticsPlatformWrapper.AnalyticsPlatform() },
-                { "userCountry", m_AnalyticsPlatformWrapper.UserCountry() }
+                { "platform", m_AnalyticsPlatformWrapper.AnalyticsPlatform() }
             };
 
             RuntimePlatform runtimePlatform = m_AnalyticsPlatformWrapper.RuntimePlatform();
@@ -72,8 +71,7 @@ namespace Unity.Services.PushNotifications
                 { "clientVersion", m_AnalyticsPlatformWrapper.ApplicationVersion() },
                 { "sdkVersion", SdkVersion.SDK_VERSION },
                 { "sdkMethod", "com.unity.services.pushNotifications.PushNotificationsAnalytics.RecordNotificationOpened" },
-                { "platform", m_AnalyticsPlatformWrapper.AnalyticsPlatform() },
-                { "userCountry", m_AnalyticsPlatformWrapper.UserCountry() }
+                { "platform", m_AnalyticsPlatformWrapper.AnalyticsPlatform() }
             };
 
             bool insertCommunicationAttrs = false;

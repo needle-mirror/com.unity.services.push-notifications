@@ -1,3 +1,5 @@
+using System;
+using Unity.Services.Analytics.Internal;
 using UnityEngine;
 
 namespace Unity.Services.PushNotifications
@@ -8,11 +10,12 @@ namespace Unity.Services.PushNotifications
         RuntimePlatform RuntimePlatform();
         bool IsApplicationFocused();
         string AnalyticsPlatform();
-        string UserCountry();
     }
     
     class PushNotificationsAnalyticsPlatformWrapper: IPushNotificationAnalyticsPlatformWrapper
     {
+        const string k_UnknownCountryCode = "ZZ";
+        
         public string ApplicationVersion()
         {
             return Application.version;
@@ -37,11 +40,6 @@ namespace Unity.Services.PushNotifications
 #else
             return "UNKNOWN";
 #endif
-        }
-
-        public string UserCountry()
-        {
-            return "GB";
         }
     }
 }

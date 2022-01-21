@@ -8,11 +8,15 @@ This SDK supports both iOS and Android. iOS 10+ and Android SDK >= 26 (Oreo) are
 
 ## Quick Start
 
-The SDK comes with a sample script that will register for push notifications. Simply add this to your project, and replace the relevant settings, to get going.
+The SDK comes with a sample script that will register for push notifications. Simply add this to your project, and set the relevant settings in the editor under Project Settings, to get going.
 
 ## Registering for Push Notifications
 
-To register for push notifications, two steps are required. Firstly, you need to initialise Unity Services, so that the required analytics events can be sent to Unity Analytics 2.0.
+To register for push notifications, three steps are required. 
+
+Firstly, you need to populate some settings in the editor. These can be found in Project Settings > Services > Push Notifications.
+
+Next, you need to initialise Unity Services, so that the required analytics events can be sent to Unity Analytics. You also need to implement the privacy flow, as detailed in the Analytics documentation, in order for the required events to be sent correctly.
 
 Once that is complete, you can then register for notifications. Ideally, to ensure no notifications are missed, this should be done in the startup code for your game. However, note that on first registration on iOS, a user will be shown a permission request, so also ensure this call is made at a convenient place in your game. The SDK will handle the showing of notification content, including images, titles and message body.
 
@@ -20,20 +24,13 @@ A full code sample is shown below.
 
 ```cs
 await UnityServices.InitializeAsync();   
-
-// Replace the below values with the relevant settings for your project, as discussed in the documentation below.     
-PushNotificationSettings settings = new PushNotificationSettings()
-{
-    AndroidApiKey = "API_KEY",
-    AndroidSenderId = "SENDER_ID",
-    AndroidApplicationId = "APPLICATION_ID",
-    AndroidProjectId = "PROJECT_ID"
-};
+// Note: This is the minimum required in Analytics version 3.0.0 and above to ensure the events with the push notification data are sent correctly.
+// In a real game you would need to handle privacy consent states here, see the Analytics documentation for more details.
+await Events.CheckForRequiredConsents();
 
 try
 {
-
-    string pushToken = await PushNotifications.RegisterForPushNotificationsAsync(settings);
+    string pushToken = await PushNotifications.RegisterForPushNotificationsAsync();
     
     PushNotifications.OnNotificationReceived += notificationData =>
     {
@@ -59,7 +56,11 @@ The SDK requires a number of settings in order to function correctly. Some setti
 * AndroidApplicationId: The application ID for a Firebase application to be used for Android's Firebase Cloud Messaging API. This can be found in your Firebase dashboard.
 * AndroidProjectId: The project ID for a Firebase project to be used for Android's Firebase Cloud Messaging API. This can be found in your Firebase dashboard.
 
-It is safe to have one settings object for all platforms, as only the settings relevant to the current platform will be used by the SDK.
+These settings are set in Project Settings -> Services -> Push Notifications. 
+
+> Note: The previous method of supplying settings in a configuration object passed to `RegisterForPushNotificationsAsync` is now deprecated - it will continue to function
+> for now but will be removed in a future release. If both code configuration and project settings are provided, the code settings will take precedence to preserve
+> backwards compatability, but you should migrate these to the Project Settings interface when possible to be ready for future releases.
 
 ### Analytics
 

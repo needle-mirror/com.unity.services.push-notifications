@@ -1,27 +1,28 @@
 {
   "name": "com.unity.services.push-notifications",
   "displayName": "Push Notifications",
-  "version": "1.0.0-pre.4",
+  "version": "1.1.0-pre.1",
   "unity": "2020.3",
   "description": "This package adds support for Push Notifications to your game. It allows sending rich push notifications with images, and provides analytics on the number of received push notifications.",
+  "documentationUrl": "https://docs.unity.com/push-notifications/",
   "dependencies": {
-    "com.unity.services.analytics": "2.0.7-pre.6",
+    "com.unity.services.analytics": "3.0.0-pre.2",
     "com.unity.nuget.newtonsoft-json": "2.0.0",
-    "com.unity.services.core": "1.1.0-pre.8"
+    "com.unity.services.core": "1.1.0-pre.41"
   },
   "samples": [
     {
-      "displayName": "Push Notifications Sample",
+      "displayName": "Push Notification Example",
       "description": "This basic sample registers for push notifications on each supported platform, and logs when notifications are received.",
       "path": "Samples~/Example"
     }
   ],
   "upmCi": {
-    "footprint": "83669ea32462b5b183f92df38eb96df64c4e1f2f"
+    "footprint": "20f54b9cc66e18ff516b5951b0d3db825c8d55cb"
   },
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/Catapult.mono.git",
     "type": "git",
-    "revision": "51276eb7d2448aa9beb59c7ecbb641b0d16a6159"
+    "revision": "77550ba99ff74cefcaa0dfb4806b313e7be3d852"
   }
 }

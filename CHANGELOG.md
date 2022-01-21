@@ -4,6 +4,17 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.1.0-pre.1] - 2022-01-21
+
+### New Features
+
+* The package is now configurable in the Project Settings UI. This is the recommended way of configuring the SDK moving forwards. The previous method of providing a configuration to the `RegisterForPushNotificationsAsync` method is now deprecated, although will continue to function for the moment. (Note that if both code and UI settings are provided, the code settings will override the UI settings).
+* The dependency on Unity Analytics has been updated to support version 3.0.0 with the new privacy flow. You will need to implement this as described in the Analytics documentation before push notification events will be sent.
+
+### Fixed
+
+* Android plugin now supports Android API versions 16+
+
 ## [1.0.0-pre.4] - 2021-08-26
 
 ### Fixed

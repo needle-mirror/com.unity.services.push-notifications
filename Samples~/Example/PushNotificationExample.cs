@@ -2,6 +2,7 @@ using System;
 using Unity.Services.Core;
 using Unity.Services.PushNotifications;
 using UnityEngine;
+using Unity.Services.Analytics;
 
 public class PushNotificationExample : MonoBehaviour
 {    
@@ -10,16 +11,12 @@ public class PushNotificationExample : MonoBehaviour
     {
         await UnityServices.InitializeAsync();
 
-        // Update the below settings to match a project you use.
-        PushNotificationSettings settings = new PushNotificationSettings()
-        {
-            AndroidApiKey = "API_KEY",
-            AndroidSenderId = "SENDER_ID",
-            AndroidApplicationId = "APPLICATION_ID",
-            AndroidProjectId = "PROJECT_ID"
-        };
+        // Note: This is the minimum required in Analytics version 3.0.0 and above to ensure the events with the push notification data are sent correctly.
+		// In a real game you would need to handle privacy consent states here, see the Analytics documentation for more details.
+        await Events.CheckForRequiredConsents();
 
-        string token = await PushNotifications.RegisterForPushNotificationsAsync(settings);
+        // Make sure to set the required settings in Project Settings before testing
+        string token = await PushNotifications.RegisterForPushNotificationsAsync();
         Debug.Log($"The push notification token is {token}");
 
         PushNotifications.OnNotificationReceived += notificationData =>

@@ -19,6 +19,7 @@ typedef void (NOTIFICATION_CALLBACK)(char *serialisedUserInfo);
 
 + (instancetype)sharedInstance;
 - (void) registerForRemoteNotifications : (REGISTRATION_CALLBACK) callback;
+- (void) flushNotificationBuffer;
 
 @end
 

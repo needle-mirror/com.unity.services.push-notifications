@@ -25,7 +25,7 @@ namespace Unity.Services.PushNotifications
         [DllImport("__Internal")]
         static extern void RegisterUnityCallbackForNotificationReceived(NotificationReceivedCallback callback);
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         internal static void PerformLaunchActions()
         {
             RegisterUnityCallbackForNotificationReceived(NotificationReceived);

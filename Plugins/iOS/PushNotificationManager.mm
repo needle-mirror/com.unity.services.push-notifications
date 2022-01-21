@@ -6,6 +6,8 @@
 
 @implementation PushNotificationManager : NSObject
 
+NSArray<NSDictionary *> *bufferedNotifications;
+
 + (void)load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -25,6 +27,8 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[PushNotificationManager alloc] init];
+        bufferedNotifications = [[NSArray alloc] init];
+        
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
         
         [nc addObserver:sharedInstance
@@ -106,6 +110,12 @@
 
 - (void) handleReceivedNotificationUserInfo: (NSDictionary *)userInfoDictionary
 {
+    if ([PushNotificationManager sharedInstance].notificationCallback == nil) {
+        // Unity hasn't had time to register the callback yet, so let's store the notification data until we're ready for it.
+        bufferedNotifications = [bufferedNotifications arrayByAddingObject:userInfoDictionary];
+        return;
+    }
+    
     NSError *error = nil;
     NSData *data = [NSJSONSerialization dataWithJSONObject:userInfoDictionary options:kNilOptions error:&error];
     
@@ -118,6 +128,13 @@
     char *jsonString = (char *) [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] UTF8String];
     
     [PushNotificationManager sharedInstance].notificationCallback(jsonString);
+}
+
+- (void) flushNotificationBuffer
+{
+    for (NSDictionary *bufferedData in bufferedNotifications) {
+        [self handleReceivedNotificationUserInfo:bufferedData];
+    }
 }
 
 // MARK: Helper methods

@@ -31,7 +31,7 @@ namespace Unity.Services.PushNotifications
                 {
                     return Task.FromResult(s_DeviceToken);
                 }
-                
+
                 if (s_DeviceRegistrationTcs != null)
                 {
                     return s_DeviceRegistrationTcs.Task;
@@ -45,9 +45,9 @@ namespace Unity.Services.PushNotifications
 
                 AndroidJavaObject instance = GetPluginInstance();
                 instance.Call("setCallbackClass", this);
-                instance.Call("initialize", applicationContext, 
+                instance.Call("initialize", applicationContext,
                     firebaseApiKey, firebaseApplicationId, firebaseSenderId, firebaseProjectId);
-                
+
                 return s_DeviceRegistrationTcs.Task;
             }
         }
@@ -71,7 +71,7 @@ namespace Unity.Services.PushNotifications
             lock (s_RegistrationLock)
             {
                 if (s_DeviceRegistrationTcs != null)
-                {   
+                {
                     if (String.IsNullOrEmpty(token))
                     {
                         s_DeviceRegistrationTcs.TrySetException(new Exception("Failed to register the device for remote notifications."));
@@ -87,7 +87,12 @@ namespace Unity.Services.PushNotifications
                 if (!String.IsNullOrEmpty(token))
                 {
                     s_DeviceToken = token;
-                    m_NotificationAnalytics.RecordPushTokenUpdated(token);
+
+                    MainThreadHelper.RunOnMainThread(() =>
+                    {
+                        m_NotificationAnalytics.RecordPushTokenUpdated(token);
+                    });
+
                     Debug.Log($"Successfully registered for remote push notifications with token: {token}");
                 }
             }
@@ -102,8 +107,11 @@ namespace Unity.Services.PushNotifications
                 return;
             }
 
-            Dictionary<string, object> notificationData = m_NotificationReceivedHandler.HandleReceivedNotification(notificationDataAsJson);
-            InternalNotificationWasReceived?.Invoke(notificationData);
+            MainThreadHelper.RunOnMainThread(() =>
+            {
+                Dictionary<string, object> notificationData = m_NotificationReceivedHandler.HandleReceivedNotification(notificationDataAsJson);
+                InternalNotificationWasReceived?.Invoke(notificationData);
+            });
         }
     }
 }

@@ -1,9 +1,9 @@
 {
   "ErrorExceptions": [
     {
-      "ValidationTest": "Manifest Validation",
-      "ExceptionMessage": "In package.json, \"documentationUrl\" can't be used for Unity packages.  It is a features reserved for enterprise customers.  The Unity documentation team will ensure the package's documentation is published in the appropriate fashion",
-      "PackageVersion": "1.1.0-pre.1"
+      "ValidationTest": "API Validation",
+      "ExceptionMessage": "Breaking changes require a new major version.",
+      "PackageVersion": "1.1.0-pre.2"
     }
   ],
   "WarningExceptions": []

@@ -7,7 +7,7 @@ namespace Unity.Services.PushNotifications
     static class SdkVersion
     {
         // This value should always match what is in the package.json for this package
-        public static readonly string SDK_VERSION = "1.1.0-pre.1";
+        public static readonly string SDK_VERSION = "1.1.0-pre.2";
     }
 
     interface IPushNotificationsAnalytics
@@ -15,7 +15,7 @@ namespace Unity.Services.PushNotifications
         void RecordPushTokenUpdated(string pushToken);
         void RecordNotificationOpened(Dictionary<string, object> payload, bool didLaunch);
     }
-    
+
     public class PushNotificationAnalytics: IPushNotificationsAnalytics
     {
         IPushNotificationEventsWrapper m_EventsWrapper;
@@ -26,7 +26,7 @@ namespace Unity.Services.PushNotifications
             m_EventsWrapper = eventsWrapper;
             m_AnalyticsPlatformWrapper = analyticsPlatformWrapper;
         }
-        
+
         /// <summary>
         /// This method should be called when the user's push notification token is updated. Most commonly this is
         /// when first registering for notifications, but can also occur at other points during the app lifecycle.
@@ -35,7 +35,7 @@ namespace Unity.Services.PushNotifications
         /// <param name="pushToken">The push token relating to this user's device.</param>
         /// <returns></returns>
         public void RecordPushTokenUpdated(string pushToken)
-        {   
+        {
             Dictionary<string, object> eventData = new Dictionary<string, object>
             {
                 { "clientVersion", m_AnalyticsPlatformWrapper.ApplicationVersion() },
@@ -75,7 +75,7 @@ namespace Unity.Services.PushNotifications
             };
 
             bool insertCommunicationAttrs = false;
-            
+
             if (payload.ContainsKey("_ddCampaign")) {
                 eventParams["campaignId"] = Convert.ToInt64(payload["_ddCampaign"]);
                 insertCommunicationAttrs = true;
@@ -88,7 +88,7 @@ namespace Unity.Services.PushNotifications
                 eventParams["communicationSender"] = payload["_ddCommunicationSender"];
                 eventParams["communicationState"] = "OPEN";
             }
-            
+
             if (didLaunch) {
                 eventParams["notificationLaunch"] = true;
             }
@@ -100,7 +100,7 @@ namespace Unity.Services.PushNotifications
                 eventParams["notificationName"] = payload["_ddName"];
             }
             eventParams["communicationState"] = "OPEN";
-            
+
             m_EventsWrapper.RecordCustomEvent("notificationOpened", eventParams, 1);
         }
     }

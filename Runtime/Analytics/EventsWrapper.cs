@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Services.Analytics;
 using Unity.Services.Analytics.Internal;
@@ -9,7 +10,7 @@ namespace Unity.Services.PushNotifications
         void RecordCustomEvent(string eventName, Dictionary<string, object> parameters, int version);
     }
 
-    class EventsWrapper: IPushNotificationEventsWrapper
+    class EventsWrapper : IPushNotificationEventsWrapper
     {
         public void RecordCustomEvent(string eventName, Dictionary<string, object> parameters, int version)
         {
@@ -19,7 +20,7 @@ namespace Unity.Services.PushNotifications
             {
                 evt.Parameters.Set(parameter.Key, parameter.Value);
             }
-            
+
             evt.Parameters.AddUserCountry();
 
             Events.Buffer.PushEvent(evt);

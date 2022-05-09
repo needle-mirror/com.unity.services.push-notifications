@@ -1,28 +1,27 @@
 using System.Collections.Generic;
-using Editor.Settings;
 using Unity.Services.Core.Editor;
 using UnityEditor;
 using UnityEngine.UIElements;
 
 namespace Unity.Services.PushNotifications.Editor
 {
-    public class PushSettingsProvider: EditorGameServiceSettingsProvider
+    public class PushSettingsProvider : EditorGameServiceSettingsProvider
     {
-        const string k_Title = "Push Notifications";        
-        
+        const string k_Title = "Push Notifications";
+
         protected override IEditorGameService EditorGameService => k_GameService;
         protected override string Title => k_Title;
         protected override string Description => "This package adds support for Push Notifications to your game. It allows sending rich push notifications with images, and provides analytics on the number of received push notifications.";
-        
+
         static readonly PushNotificationEditorGameService k_GameService = new PushNotificationEditorGameService();
-        
+
         PushSettingsProvider(SettingsScope scopes, IEnumerable<string> keywords = null)
-            : base(GenerateProjectSettingsPath(k_Title), scopes, keywords) { }
+            : base(GenerateProjectSettingsPath(k_Title), scopes, keywords) {}
 
         protected override VisualElement GenerateServiceDetailUI()
         {
             SerializedObject serializedSettings = GetSerializedSettings();
-            
+
             VisualElement containerVisualElement = new VisualElement();
 
             Label headerLabel = new Label("Android");
@@ -30,12 +29,12 @@ namespace Unity.Services.PushNotifications.Editor
             headerLabel.style.unityFontStyleAndWeight = UnityEngine.FontStyle.Bold;
             headerLabel.style.marginLeft = 4;
             containerVisualElement.Add(headerLabel);
-            
+
             CreateFormRow("API Key", nameof(PushNotificationSettings.androidApiKey), serializedSettings, containerVisualElement);
             CreateFormRow("Sender ID", nameof(PushNotificationSettings.androidSenderId), serializedSettings, containerVisualElement);
             CreateFormRow("Application ID", nameof(PushNotificationSettings.androidApplicationId), serializedSettings, containerVisualElement);
             CreateFormRow("Project ID", nameof(PushNotificationSettings.androidProjectId), serializedSettings, containerVisualElement);
-            
+
             return containerVisualElement;
         }
 
@@ -67,7 +66,8 @@ namespace Unity.Services.PushNotifications.Editor
             textField.RegisterValueChangedCallback(delegate(ChangeEvent<string> evt)
             {
                 settings.FindProperty(fieldName).stringValue = evt.newValue;
-                if (settings.ApplyModifiedProperties()) {
+                if (settings.ApplyModifiedProperties())
+                {
                     AssetDatabase.SaveAssets();
                 }
             });
@@ -77,7 +77,7 @@ namespace Unity.Services.PushNotifications.Editor
             container.Add(rowContainer);
         }
 
-        static SerializedObject GetSerializedSettings() 
+        static SerializedObject GetSerializedSettings()
         {
             PushNotificationSettings cfg = AssetDatabase.LoadAssetAtPath<PushNotificationSettings>(PushNotificationSettings.fullAssetPath);
 

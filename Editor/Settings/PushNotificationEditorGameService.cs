@@ -1,14 +1,14 @@
 using Unity.Services.Core.Editor;
 using UnityEditor;
 
-namespace Editor.Settings
+namespace Unity.Services.PushNotifications.Editor
 {
     public struct PushNotificationIdentifier : IEditorGameServiceIdentifier
     {
         public string GetKey() => "Push Notifications";
     }
-    
-    public class PushNotificationEditorGameService: IEditorGameService
+
+    public class PushNotificationEditorGameService : IEditorGameService
     {
         static readonly PushNotificationIdentifier k_Identifier = new PushNotificationIdentifier();
 

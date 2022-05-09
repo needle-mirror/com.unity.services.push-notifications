@@ -7,7 +7,7 @@ namespace Unity.Services.PushNotifications
     static class SdkVersion
     {
         // This value should always match what is in the package.json for this package
-        public static readonly string SDK_VERSION = "2.0.0-pre.1";
+        public static readonly string SDK_VERSION = "2.0.0-pre.2";
     }
 
     interface IPushNotificationsAnalytics

@@ -4,6 +4,20 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### New Features 
+
+* The default API of the SDK has changed to align with our other UGS packages, and is now available via `PushNotificationsService.Instance` rather than `PushNotifications` as before. The previous API has been kept for backwards compatability, but will be removed in a future release.
+
+### Fixed
+
+* Notifications will be shown as expected when an Android app is completely closed
+
+### Removed
+
+* The deprecated in-code settings API has been removed - the SDK should be configured via the Project Settings UI added in 1.1.0-pre.1
+
 ## [1.1.0-pre.2] - 2022-03-16
 
 ### Fixed

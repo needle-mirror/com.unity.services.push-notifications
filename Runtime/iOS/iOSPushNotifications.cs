@@ -21,7 +21,7 @@ namespace Unity.Services.PushNotifications
 #if UNITY_IOS && !UNITY_EDITOR
         [DllImport("__Internal")]
         static extern void NativeRegisterForPushNotifications(NotificationRegistrationCallback callback);
-        
+
         [DllImport("__Internal")]
         static extern void RegisterUnityCallbackForNotificationReceived(NotificationReceivedCallback callback);
 
@@ -30,8 +30,9 @@ namespace Unity.Services.PushNotifications
         {
             RegisterUnityCallbackForNotificationReceived(NotificationReceived);
         }
+
 #endif
-        
+
         /// <summary>
         /// Registers for push notifications on iOS. Returns the device token for the registered device.
         /// </summary>
@@ -45,14 +46,14 @@ namespace Unity.Services.PushNotifications
                 {
                     return Task.FromResult(s_DeviceToken);
                 }
-                
+
                 if (s_DeviceRegistrationTcs != null)
                 {
                     return s_DeviceRegistrationTcs.Task;
                 }
 
                 s_DeviceRegistrationTcs = new TaskCompletionSource<string>();
-                
+
                 NativeRegisterForPushNotifications(NotificationRegistrationTokenReceived);
 
                 return s_DeviceRegistrationTcs.Task;
@@ -68,7 +69,7 @@ namespace Unity.Services.PushNotifications
         {
             lock (s_RegistrationLock)
             {
-                if (String.IsNullOrEmpty(token))
+                if (string.IsNullOrEmpty(token))
                 {
                     s_DeviceRegistrationTcs.TrySetException(new Exception("Failed to register the device for remote notifications."));
                 }
@@ -76,7 +77,7 @@ namespace Unity.Services.PushNotifications
                 {
                     s_DeviceToken = token;
                     s_DeviceRegistrationTcs.TrySetResult(token);
-                    PushNotifications.Analytics.RecordPushTokenUpdated(token);
+                    PushNotificationsService.internalInstance.Analytics.RecordPushTokenUpdated(token);
                     Debug.Log($"Successfully registered for remote push notifications with token: {token}");
                 }
 
@@ -93,7 +94,7 @@ namespace Unity.Services.PushNotifications
                 return;
             }
 
-            Dictionary<string, object> userInfo = PushNotifications.notificationReceivedHandler.HandleReceivedNotification(serialisedNotificationData);
+            Dictionary<string, object> userInfo = PushNotificationsService.internalInstance.notificationReceivedHandler.HandleReceivedNotification(serialisedNotificationData);
             InternalNotificationWasReceived?.Invoke(userInfo);
         }
     }

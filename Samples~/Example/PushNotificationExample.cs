@@ -5,21 +5,21 @@ using UnityEngine;
 using Unity.Services.Analytics;
 
 public class PushNotificationExample : MonoBehaviour
-{    
+{
     // Start is called before the first frame update
     async void Start()
     {
         await UnityServices.InitializeAsync();
 
         // Note: This is the minimum required in Analytics version 3.0.0 and above to ensure the events with the push notification data are sent correctly.
-		// In a real game you would need to handle privacy consent states here, see the Analytics documentation for more details.
-        await Events.CheckForRequiredConsents();
+		    // In a real game you would need to handle privacy consent states here, see the Analytics documentation for more details.
+        await AnalyticsService.Instance.CheckForRequiredConsents();
 
         // Make sure to set the required settings in Project Settings before testing
-        string token = await PushNotifications.RegisterForPushNotificationsAsync();
+        string token = await PushNotificationsService.Instance.RegisterForPushNotificationsAsync();
         Debug.Log($"The push notification token is {token}");
 
-        PushNotifications.OnNotificationReceived += notificationData =>
+        PushNotificationsService.Instance.OnNotificationReceived += notificationData =>
         {
             Debug.Log("Data retrieved!");
         };

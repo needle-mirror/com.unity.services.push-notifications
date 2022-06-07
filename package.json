@@ -1,11 +1,11 @@
 {
   "name": "com.unity.services.push-notifications",
   "displayName": "Push Notifications",
-  "version": "1.1.0-pre.2",
+  "version": "2.0.0-pre.1",
   "unity": "2020.3",
   "description": "This package adds support for Push Notifications to your game. It allows sending rich push notifications with images, and provides analytics on the number of received push notifications.",
   "dependencies": {
-    "com.unity.services.analytics": "3.0.0-pre.4",
+    "com.unity.services.analytics": "4.0.0-pre.2",
     "com.unity.services.core": "1.2.0"
   },
   "samples": [
@@ -15,15 +15,15 @@
       "path": "Samples~/Example"
     }
   ],
-  "upm": {
+  "_upm": {
     "changelog": "### Fixed\n\n* Android plugin now uses a named Firebase instance to avoid clashing with any default instances already in the project."
   },
   "upmCi": {
-    "footprint": "a8730594b43c4385583f793130597f47517b822f"
+    "footprint": "847b090baf556a3ed552e0a124fe676a17feb0a1"
   },
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/operate-services-sdk.git",
     "type": "git",
-    "revision": "5bb5f1afc6b37bdabcbfb251329ebcb59954db22"
+    "revision": "26dbbb1ee0f91943208de063bb287e35881fb19c"
   }
 }

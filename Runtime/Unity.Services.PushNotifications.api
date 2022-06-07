@@ -3,6 +3,13 @@
 // make sure the XML doc file is present and located next to the scraped dll
 namespace Unity.Services.PushNotifications
 {
+    public interface IPushNotificationsService
+    {
+        public event System.Action<System.Collections.Generic.Dictionary<string, object>> OnNotificationReceived;
+        public abstract Unity.Services.PushNotifications.PushNotificationAnalytics Analytics { get; }
+        public abstract System.Threading.Tasks.Task<string> RegisterForPushNotificationsAsync();
+    }
+
     public class PushNotificationAnalytics : Unity.Services.PushNotifications.IPushNotificationsAnalytics
     {
         public virtual void RecordNotificationOpened(System.Collections.Generic.Dictionary<string, object> payload, bool didLaunch);
@@ -15,13 +22,12 @@ namespace Unity.Services.PushNotifications
         public virtual System.Threading.Tasks.Task Initialize(Unity.Services.Core.Internal.CoreRegistry registry);
     }
 
-    public class PushNotifications
+    [System.Obsolete(@"The interface provided by PushNotifications has moved to PushNotificationsService.Instance, and should be accessed from there instead. This API will be removed in an upcoming release.")] public class PushNotifications
     {
-        public static event System.Action<System.Collections.Generic.Dictionary<string, object>> OnNotificationReceived;
-        public static Unity.Services.PushNotifications.PushNotificationAnalytics Analytics { get; }
+        [System.Obsolete(@"The interface provided by PushNotifications.OnNotificationReceived has moved to PushNotificationsService.Instance.OnNotificationReceived, and should be accessed from there instead. This API will be removed in an upcoming release.")] public static event System.Action<System.Collections.Generic.Dictionary<string, object>> OnNotificationReceived;
+        [System.Obsolete(@"The interface provided by PushNotifications.Analytics has moved to PushNotificationsService.Instance.Analytics, and should be accessed from there instead. This API will be removed in an upcoming release.")] public static Unity.Services.PushNotifications.PushNotificationAnalytics Analytics { get; }
         public PushNotifications() {}
-        public static System.Threading.Tasks.Task<string> RegisterForPushNotificationsAsync();
-        [System.Obsolete(@"Settings should now be configured in the Editor's Project Settings, and then register using the parameterless version of RegisterForPushNotificationsAsync", false)] public static System.Threading.Tasks.Task<string> RegisterForPushNotificationsAsync(Unity.Services.PushNotifications.PushNotificationSettings settings);
+        [System.Obsolete(@"The interface provided by PushNotifications.RegisterForPushNotificationsAsync has moved to PushNotificationsService.Instance.RegisterForPushNotificationsAsync, and should be accessed from there instead. This API will be removed in an upcoming release.")] public static System.Threading.Tasks.Task<string> RegisterForPushNotificationsAsync();
     }
 
     public class PushNotificationSettings : UnityEngine.ScriptableObject
@@ -36,5 +42,10 @@ namespace Unity.Services.PushNotifications
         [System.Obsolete(@"This field is obsolete - use the androidSenderId serialised field directly", false)] public string AndroidSenderId { get; set; }
         public PushNotificationSettings() {}
         public static Unity.Services.PushNotifications.PushNotificationSettings GetAssetInstance();
+    }
+
+    public static class PushNotificationsService
+    {
+        public static Unity.Services.PushNotifications.IPushNotificationsService Instance { get; }
     }
 }

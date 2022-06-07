@@ -1,4 +1,4 @@
-Push Notifications copyright © 2021 Unity Technologies SF
+Push Notifications copyright © 2022 Unity Technologies SF
 
 This software is subject to, and made available under, the terms of services for Push Notifications (see https://unity3d.com/legal/one-operate-services-terms-of-service ).
 

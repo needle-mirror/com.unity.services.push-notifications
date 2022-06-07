@@ -27,11 +27,12 @@ await UnityServices.InitializeAsync();
 // Note: This is the minimum required in Analytics version 3.0.0 and above to ensure the events with the push notification data are sent correctly.
 // In a real game you would need to handle privacy consent states here, see the Analytics documentation for more details.
 await Events.CheckForRequiredConsents();
+
 try
 {
-    string pushToken = await PushNotifications.RegisterForPushNotificationsAsync();
+    string pushToken = await PushNotificationService.Instance.RegisterForPushNotificationsAsync();
     
-    PushNotifications.OnNotificationReceived += notificationData =>
+    PushNotificationService.Instance..OnNotificationReceived += notificationData =>
     {
         Debug.Log("Received a notification!");
     };
@@ -57,9 +58,6 @@ The SDK requires a number of settings in order to function correctly. Some setti
 
 These settings are set in Project Settings -> Services -> Push Notifications.
 
-> Note: The previous method of supplying settings in a configuration object passed to `RegisterForPushNotificationsAsync` is now deprecated - it'll continue to function
-> for now but will be removed in a future release. If both code configuration and project settings are provided, the code settings will take precedence to preserve
-> backwards compatability, but you should migrate these to the Project Settings interface when possible to be ready for future releases.
 ### Analytics
 
 The SDK will record two analytics events:
@@ -71,7 +69,7 @@ The SDK will record two analytics events:
 
 *WARNING: This section is only applicable if you're trying to use the Unity Dashboard Push Notification service alongside a separate Push Notification implementation. For most users this section is not required or recommended as it'll lead to reduced functionality of the product*
 
-It's possible to integrate the SDK with an existing push notification service if required. To do so, do not call the registration methods as indicated above, and instead use the two methods in the `PushNotifications.Analytics` class alongside your existing implementation.
+It's possible to integrate the SDK with an existing push notification service if required. To do so, do not call the registration methods as indicated above, and instead use the two methods in `PushNotificationService.Instance.Analytics` alongside your existing implementation.
 
 `RecordPushTokenUpdated` should be called when you receive a new push token for a device. Note that the OS may create a new token at multiple points in the app's lifecycle, so call this whenever the token changes, and not just at startup.
 

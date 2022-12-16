@@ -4,15 +4,18 @@
 
 #import "PushNotificationManager.h"
 
+//MARK: Internal Class. Not publicly supported. Do not use directly.
 @implementation PushNotificationManager : NSObject
 
 NSArray<NSDictionary *> *bufferedNotifications;
+
+NSString *launchedNotificationString;
 
 + (void)load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         [PushNotificationManager sharedInstance];
-        
+
         UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
         center.delegate = [PushNotificationManager sharedInstance];
     });
@@ -23,14 +26,15 @@ NSArray<NSDictionary *> *bufferedNotifications;
 + (instancetype)sharedInstance
 {
     static PushNotificationManager *sharedInstance = nil;
-    
+
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[PushNotificationManager alloc] init];
         bufferedNotifications = [[NSArray alloc] init];
-        
+        launchedNotificationString = nil;
+
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-        
+
         [nc addObserver:sharedInstance
                selector:@selector(didRegisterForRemoteNotifications:)
                    name:kUnityDidRegisterForRemoteNotificationsWithDeviceToken
@@ -40,13 +44,18 @@ NSArray<NSDictionary *> *bufferedNotifications;
                selector:@selector(didFailToRegisterForRemoteNotifications:)
                    name:kUnityDidFailToRegisterForRemoteNotificationsWithError
                  object:nil];
-        
+
         [nc addObserver:sharedInstance
                selector:@selector(didReceiveNotification:)
                    name:kUnityDidReceiveRemoteNotification
                  object:nil];
+
+        [nc addObserver:sharedInstance
+               selector:@selector(createLaunchedNotificationChecker:)
+                   name:@"UIApplicationDidFinishLaunchingNotification"
+                 object:nil];
     });
-    
+
     return sharedInstance;
 }
 
@@ -60,9 +69,9 @@ NSArray<NSDictionary *> *bufferedNotifications;
         callback((char *)_deviceToken.UTF8String);
         return;
     }
-    
+
     _registrationCallback = callback;
-    
+
     // Register for the permissions to display notifications from the iOS system. Without this, we'd receive
     // the pushes but wouldn't be able to display them to a user.
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
@@ -115,26 +124,63 @@ NSArray<NSDictionary *> *bufferedNotifications;
         bufferedNotifications = [bufferedNotifications arrayByAddingObject:userInfoDictionary];
         return;
     }
-    
-    NSError *error = nil;
-    NSData *data = [NSJSONSerialization dataWithJSONObject:userInfoDictionary options:kNilOptions error:&error];
-    
-    if (error != nil)
-    {
-        NSLog(@"Failed to serialise notification user info to string. User info was: %@", userInfoDictionary);
-        return;
-    }
 
-    char *jsonString = (char *) [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] UTF8String];
-    
+    char *jsonString = [self serializeRemoteNotification:userInfoDictionary];
+
     [PushNotificationManager sharedInstance].notificationCallback(jsonString);
 }
 
 - (void) flushNotificationBuffer
 {
-    for (NSDictionary *bufferedData in bufferedNotifications) {
-        [self handleReceivedNotificationUserInfo:bufferedData];
+    NSMutableArray *tempBuffer = [NSMutableArray arrayWithArray:bufferedNotifications];
+    NSMutableArray *emptyBuffer = [NSMutableArray arrayWithArray:bufferedNotifications];
+
+    [emptyBuffer removeAllObjects];
+    bufferedNotifications = [NSArray arrayWithArray:emptyBuffer];
+
+    for (NSDictionary *bufferedData in tempBuffer) {
+            [self handleReceivedNotificationUserInfo:bufferedData];
     }
+}
+
+- (char *) serializeRemoteNotification: (NSDictionary *)notificationDictionary
+{
+    NSError *error = nil;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:notificationDictionary options:kNilOptions error:&error];
+
+    if (error != nil)
+    {
+        NSLog(@"Failed to serialize notification user info to string. User info was: %@", notificationDictionary);
+        return nil;
+    }
+
+    char *jsonString = (char *) [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] UTF8String];
+
+    return jsonString;
+}
+
+/// Checks if app was launched from notification and sends to notification handler
+- (void)createLaunchedNotificationChecker:(NSNotification *)notification
+{
+    NSDictionary *launchOptions = [notification userInfo];
+    NSDictionary *launchedNotification = [launchOptions objectForKey: @"UIApplicationLaunchOptionsRemoteNotificationKey"];
+
+    if (launchedNotification)
+    {
+        char *serializedString = [self serializeRemoteNotification:launchedNotification];
+
+        launchedNotificationString = [NSString stringWithFormat:@"%s", serializedString];
+    }
+}
+
+- (char *) getLaunchedNotificationString
+{
+    return [[PushNotificationManager sharedInstance] convertNSStringToCString: launchedNotificationString];
+}
+
+- (void) resetLaunchedNotificationString
+{
+    launchedNotificationString = nil;
 }
 
 // MARK: Helper methods
@@ -148,6 +194,19 @@ NSArray<NSDictionary *> *bufferedNotifications;
     }
 
     return [token copy];
+}
+
+- (char *) convertNSStringToCString: (NSString*) nsString
+{
+    if (nsString == nil)
+        return nil;
+
+    const char* nsStringUtf8 = [nsString UTF8String];
+    //create a null terminated C string on the heap so that our string's memory isn't wiped out right after method's return
+    char* cString = (char*)malloc(strlen(nsStringUtf8) + 1);
+    strcpy(cString, nsStringUtf8);
+
+    return cString;
 }
 
 @end

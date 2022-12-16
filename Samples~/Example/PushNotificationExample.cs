@@ -11,7 +11,7 @@ public class PushNotificationExample : MonoBehaviour
     {
         await UnityServices.InitializeAsync();
 
-        // Note: This is the minimum required in Analytics version 3.0.0 and above to ensure the events with the push notification data are sent correctly.
+        // Note: This is the minimum required to ensure the events with the push notification data are sent correctly through Analytics.
 		    // In a real game you would need to handle privacy consent states here, see the Analytics documentation for more details.
         await AnalyticsService.Instance.CheckForRequiredConsents();
 

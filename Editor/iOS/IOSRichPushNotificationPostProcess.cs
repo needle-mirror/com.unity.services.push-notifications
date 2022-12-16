@@ -8,10 +8,10 @@ using UnityEngine;
 
 namespace Unity.Services.PushNotifications.Editor
 {
-    public class IOSRichPushNotificationPostProcess : MonoBehaviour
+    internal class IOSRichPushNotificationPostProcess : MonoBehaviour
     {
         const string k_PathToInfoPlistInsideTarget = "Info.plist";
-    
+
         [PostProcessBuild(1)]
         public static void CreateRichPushNotificationTarget(BuildTarget buildTarget, string buildOutputPath)
         {
@@ -19,19 +19,19 @@ namespace Unity.Services.PushNotifications.Editor
             {
                 return;
             }
-            
+
             string xcodeProjectPath = PBXProject.GetPBXProjectPath(buildOutputPath);
             PBXProject project = new PBXProject();
             project.ReadFromFile(xcodeProjectPath);
 
             string guidOfInitialTarget = project.GetUnityMainTargetGuid();
-            
+
             string bundleIdentifierForNotificationService = Application.identifier + ".notificationservice";
             int indexOfLastIdentifierSection = bundleIdentifierForNotificationService.LastIndexOf('.') + 1;
             string displayName = bundleIdentifierForNotificationService.Substring(indexOfLastIdentifierSection);
-            
+
             string pathToNotificationServiceImplementation = Path.Combine(buildOutputPath, displayName);
-            
+
             if (!Directory.Exists(pathToNotificationServiceImplementation))
             {
                 Directory.CreateDirectory(pathToNotificationServiceImplementation);
@@ -46,7 +46,7 @@ namespace Unity.Services.PushNotifications.Editor
             notificationServicePlist.root.SetString("CFBundleVersion", PlayerSettings.iOS.buildNumber);
             string pathToNotificationServicePlist = Path.Combine(pathToNotificationServiceImplementation, k_PathToInfoPlistInsideTarget);
             notificationServicePlist.WriteToFile(pathToNotificationServicePlist);
-            
+
             string guidOfExtension = project.AddAppExtension(guidOfInitialTarget,
                 displayName,
                 bundleIdentifierForNotificationService,
@@ -55,19 +55,19 @@ namespace Unity.Services.PushNotifications.Editor
             string buildPhaseId = project.AddSourcesBuildPhase(guidOfExtension);
 
             AddSourceFileToProject(
-                project, 
-                "NotificationService.h", 
-                displayName, 
-                guidOfExtension, 
-                buildPhaseId, 
+                project,
+                "NotificationService.h",
+                displayName,
+                guidOfExtension,
+                buildPhaseId,
                 pathToNotificationServiceImplementation
             );
             AddSourceFileToProject(
-                project, 
-                "NotificationService.m", 
-                displayName, 
-                guidOfExtension, 
-                buildPhaseId, 
+                project,
+                "NotificationService.m",
+                displayName,
+                guidOfExtension,
+                buildPhaseId,
                 pathToNotificationServiceImplementation
             );
             AddFileToProject(
@@ -76,7 +76,7 @@ namespace Unity.Services.PushNotifications.Editor
                 "Info.plist",
                 displayName
             );
-            
+
             project.AddFrameworkToProject(guidOfExtension, "NotificationCenter.framework", true);
             project.AddFrameworkToProject(guidOfExtension, "UserNotifications.framework", true);
             project.SetBuildProperty(guidOfExtension, "ARCHS", "$(ARCHS_STANDARD");
@@ -97,13 +97,13 @@ namespace Unity.Services.PushNotifications.Editor
         }
 
         static void AddSourceFileToProject(
-            PBXProject project, 
-            string filename, 
+            PBXProject project,
+            string filename,
             string extensionDisplayName,
-            string extensionGuid, 
+            string extensionGuid,
             string buildPhase,
             string pathToImplementation
-            )
+        )
         {
             string sourceFilepath = Path.Combine(GetPathToSourceDirectory(), filename);
             string destinationFilepath = Path.Combine(pathToImplementation, filename);

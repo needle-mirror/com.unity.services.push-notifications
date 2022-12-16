@@ -9,7 +9,7 @@ namespace Unity.Services.PushNotifications
     {
         readonly IPushNotificationAnalyticsPlatformWrapper m_PlatformWrapper;
         readonly IPushNotificationsAnalytics m_NotificationAnalytics;
-        
+
         bool m_IsCleanStart = true;
 
         internal PushNotificationReceivedHandler(IPushNotificationsAnalytics analytics, IPushNotificationAnalyticsPlatformWrapper platformWrapper)
@@ -17,7 +17,7 @@ namespace Unity.Services.PushNotifications
             m_NotificationAnalytics = analytics;
             m_PlatformWrapper = platformWrapper;
         }
-        
+
         internal Dictionary<string, object> HandleReceivedNotification(string jsonNotificationData)
         {
             try

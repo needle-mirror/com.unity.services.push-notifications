@@ -14,11 +14,32 @@ namespace Unity.Services.PushNotifications
         PushNotificationReceivedHandler m_NotificationReceivedHandler;
         PushNotificationAnalytics m_NotificationAnalytics;
 
+        AndroidJavaObject m_IntentExtras;
+
         public AndroidPushNotifications(PushNotificationReceivedHandler notificationReceivedHandler, PushNotificationAnalytics analytics)
             : base("com.unity.services.pushnotifications.android.UnityCallbackClass")
         {
             m_NotificationReceivedHandler = notificationReceivedHandler;
             m_NotificationAnalytics = analytics;
+
+            try
+            {
+                AndroidJavaObject intent = GetCurrentActivity().Call<AndroidJavaObject>("getIntent");
+                string intentNotificationData = intent.Call<string>("getStringExtra", "notificationData");
+
+                if (intentNotificationData != null)
+                {
+                    Debug.Log("App launched from notification, sending relevant events");
+                    OnNotificationReceived(intentNotificationData);
+
+                    // remove opened notificationData so it cannot be re-processed
+                    intent.Call("removeExtra", "notificationData");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to check intent for notification data: {e.Message}");
+            }
         }
 
         internal event Action<Dictionary<string, object>> InternalNotificationWasReceived;
@@ -39,14 +60,19 @@ namespace Unity.Services.PushNotifications
 
                 s_DeviceRegistrationTcs = new TaskCompletionSource<string>();
 
-                AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-                AndroidJavaObject applicationContext = activity.Call<AndroidJavaObject>("getApplicationContext");
+                try
+                {
+                    AndroidJavaObject applicationContext = GetCurrentActivity().Call<AndroidJavaObject>("getApplicationContext");
 
-                AndroidJavaObject instance = GetPluginInstance();
-                instance.Call("setCallbackClass", this);
-                instance.Call("initialize", applicationContext,
-                    firebaseApiKey, firebaseApplicationId, firebaseSenderId, firebaseProjectId);
+                    AndroidJavaObject instance = GetPluginInstance();
+                    instance.Call("setCallbackClass", this);
+                    instance.Call("initialize", applicationContext,
+                        firebaseApiKey, firebaseApplicationId, firebaseSenderId, firebaseProjectId);
+                }
+                catch (Exception e)
+                {
+                    s_DeviceRegistrationTcs.TrySetException(new Exception($"Failed to initialize Push Notification plugin instance and register the device for remote notifications"));
+                }
 
                 return s_DeviceRegistrationTcs.Task;
             }
@@ -63,6 +89,12 @@ namespace Unity.Services.PushNotifications
             }
 
             return instance;
+        }
+
+        AndroidJavaObject GetCurrentActivity()
+        {
+            AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            return unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
         }
 
         // Called from the Kotlin code

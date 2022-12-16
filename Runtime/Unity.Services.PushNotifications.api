@@ -3,49 +3,31 @@
 // make sure the XML doc file is present and located next to the scraped dll
 namespace Unity.Services.PushNotifications
 {
+    public interface IPushNotificationsAnalytics
+    {
+        public void RecordNotificationOpened(System.Collections.Generic.Dictionary<string, object> payload, bool didLaunch);
+        public void RecordPushTokenUpdated(string pushToken);
+    }
+
     public interface IPushNotificationsService
     {
         public event System.Action<System.Collections.Generic.Dictionary<string, object>> OnNotificationReceived;
-        public abstract Unity.Services.PushNotifications.PushNotificationAnalytics Analytics { get; }
-        public abstract System.Threading.Tasks.Task<string> RegisterForPushNotificationsAsync();
-    }
-
-    public class PushNotificationAnalytics : Unity.Services.PushNotifications.IPushNotificationsAnalytics
-    {
-        public virtual void RecordNotificationOpened(System.Collections.Generic.Dictionary<string, object> payload, bool didLaunch);
-        public virtual void RecordPushTokenUpdated(string pushToken);
-    }
-
-    public class PushNotificationCoreInitialization : Unity.Services.Core.Internal.IInitializablePackage
-    {
-        public PushNotificationCoreInitialization() {}
-        public virtual System.Threading.Tasks.Task Initialize(Unity.Services.Core.Internal.CoreRegistry registry);
-    }
-
-    [System.Obsolete(@"The interface provided by PushNotifications has moved to PushNotificationsService.Instance, and should be accessed from there instead. This API will be removed in an upcoming release.")] public class PushNotifications
-    {
-        [System.Obsolete(@"The interface provided by PushNotifications.OnNotificationReceived has moved to PushNotificationsService.Instance.OnNotificationReceived, and should be accessed from there instead. This API will be removed in an upcoming release.")] public static event System.Action<System.Collections.Generic.Dictionary<string, object>> OnNotificationReceived;
-        [System.Obsolete(@"The interface provided by PushNotifications.Analytics has moved to PushNotificationsService.Instance.Analytics, and should be accessed from there instead. This API will be removed in an upcoming release.")] public static Unity.Services.PushNotifications.PushNotificationAnalytics Analytics { get; }
-        public PushNotifications() {}
-        [System.Obsolete(@"The interface provided by PushNotifications.RegisterForPushNotificationsAsync has moved to PushNotificationsService.Instance.RegisterForPushNotificationsAsync, and should be accessed from there instead. This API will be removed in an upcoming release.")] public static System.Threading.Tasks.Task<string> RegisterForPushNotificationsAsync();
+        public IPushNotificationsAnalytics Analytics { get; }
+        public System.Threading.Tasks.Task<string> RegisterForPushNotificationsAsync();
     }
 
     public class PushNotificationSettings : UnityEngine.ScriptableObject
     {
-        public string androidApiKey;
-        public string androidApplicationId;
-        public string androidProjectId;
-        public string androidSenderId;
-        [System.Obsolete(@"This field is obsolete - use the androidApiKey serialised field directly", false)] public string AndroidApiKey { get; set; }
-        [System.Obsolete(@"This field is obsolete - use the androidApplicationId serialised field directly", false)] public string AndroidApplicationId { get; set; }
-        [System.Obsolete(@"This field is obsolete - use the androidProjectId serialised field directly", false)] public string AndroidProjectId { get; set; }
-        [System.Obsolete(@"This field is obsolete - use the androidSenderId serialised field directly", false)] public string AndroidSenderId { get; set; }
+        [UnityEngine.Serialization.FormerlySerializedAs(@"androidApplicationId")] public string firebaseAppID;
+        [UnityEngine.Serialization.FormerlySerializedAs(@"androidProjectId")] public string firebaseProjectID;
+        [UnityEngine.Serialization.FormerlySerializedAs(@"androidSenderId")] public string firebaseProjectNumber;
+        [UnityEngine.Header(@"Android (Firebase) Settings")] [UnityEngine.Serialization.FormerlySerializedAs(@"androidApiKey")] public string firebaseWebApiKey;
         public PushNotificationSettings() {}
-        public static Unity.Services.PushNotifications.PushNotificationSettings GetAssetInstance();
+        public static PushNotificationSettings GetAssetInstance();
     }
 
     public static class PushNotificationsService
     {
-        public static Unity.Services.PushNotifications.IPushNotificationsService Instance { get; }
+        public static IPushNotificationsService Instance { get; }
     }
 }

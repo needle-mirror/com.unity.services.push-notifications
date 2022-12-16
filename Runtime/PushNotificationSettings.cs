@@ -1,6 +1,7 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Unity.Services.PushNotifications
 {
@@ -17,51 +18,16 @@ namespace Unity.Services.PushNotifications
         internal const string resourcesDirectory = "Resources";
         internal const string assetDirectory = resourcesContainer + "/" + resourcesDirectory;
         internal const string fullAssetPath = assetDirectory + "/" + settingsAssetName + ".asset";
-        
-        public string androidApiKey;
-        public string androidSenderId;
-        public string androidApplicationId;
-        public string androidProjectId;
 
-        /// <summary>
-        /// The Firebase API Key for the project to use for Firebase Cloud Messaging. This should match the project you have configured
-        /// in the Push Notification dashboard.
-        /// </summary>
-        [Obsolete("This field is obsolete - use the androidApiKey serialised field directly", false)]
-        public string AndroidApiKey {
-            get => androidApiKey;
-            set => androidApiKey = value;
-        }
-        
-        /// <summary>
-        /// The Firebase sender ID for the project to use for Firebase Cloud Messaging. This should match the project you have configured
-        /// in the Push Notification dashboard.
-        /// </summary>
-        [Obsolete("This field is obsolete - use the androidSenderId serialised field directly", false)]
-        public string AndroidSenderId {
-            get => androidSenderId;
-            set => androidSenderId = value;
-        }
-        
-        /// <summary>
-        /// The Firebase application ID for the project to use for Firebase Cloud Messaging. This should match the project you have configured
-        /// in the Push Notification dashboard.
-        /// </summary>
-        [Obsolete("This field is obsolete - use the androidApplicationId serialised field directly", false)]
-        public string AndroidApplicationId {
-            get => androidApplicationId;
-            set => androidApplicationId = value;
-        }
-        
-        /// <summary>
-        /// The Firebase project ID for the project to use for Firebase Cloud Messaging. This should match the project you have configured
-        /// in the Push Notification dashboard.
-        /// </summary>
-        [Obsolete("This field is obsolete - use the androidProjectId serialised field directly", false)]
-        public string AndroidProjectId {
-            get => androidProjectId;
-            set => androidProjectId = value;
-        }
+        [Header("Android (Firebase) Settings")]
+        [FormerlySerializedAs("androidApiKey")]
+        public string firebaseWebApiKey;
+        [FormerlySerializedAs("androidSenderId")]
+        public string firebaseProjectNumber;
+        [FormerlySerializedAs("androidApplicationId")]
+        public string firebaseAppID;
+        [FormerlySerializedAs("androidProjectId")]
+        public string firebaseProjectID;
 
         /// <summary>
         /// Retrieves the copy of the settings persisted as an asset. Will return an empty settings object if no asset is available.
@@ -72,11 +38,11 @@ namespace Unity.Services.PushNotifications
         {
             PushNotificationSettings cfg = Resources.Load<PushNotificationSettings>(settingsAssetName);
 
-            if(cfg == null)
+            if (cfg == null)
             {
                 cfg = CreateInstance<PushNotificationSettings>();
             }
-            
+
             return cfg;
         }
     }

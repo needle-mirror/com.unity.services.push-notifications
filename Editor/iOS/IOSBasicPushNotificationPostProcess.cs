@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Unity.Services.PushNotifications.Editor
 {
-    public class IOSBasicPushNotificationPostProcess : MonoBehaviour
+    internal class IOSBasicPushNotificationPostProcess : MonoBehaviour
     {
         [PostProcessBuild(0)]
         public static void OnPostProcessBuild(BuildTarget buildTarget, String path)
@@ -29,7 +29,7 @@ namespace Unity.Services.PushNotifications.Editor
             AddCapabilities(project, projectPath, mainTargetGuid, path);
             UpdateInfoPlist(path);
             UpdatePreprocessorFile(path);
-            
+
             project.WriteToFile(projectPath);
         }
 
@@ -40,7 +40,7 @@ namespace Unity.Services.PushNotifications.Editor
             {
                 string bundleIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.iOS);
                 entitlementsFileName = $"{bundleIdentifier.Substring(bundleIdentifier.LastIndexOf(".") + 1)}.entitlements";
-                
+
                 // Add the entitlements file to the build
                 project.AddFile(Path.Combine(buildPath, entitlementsFileName), entitlementsFileName);
                 project.AddBuildProperty(mainTargetGuid, "CODE_SIGN_ENTITLEMENTS", entitlementsFileName);
@@ -48,11 +48,11 @@ namespace Unity.Services.PushNotifications.Editor
 
             var capManager = new ProjectCapabilityManager(projectPath, entitlementsFileName, "Unity-iPhone");
 
-            // TODO: Do we want to allow the user to specify which push environment they want to use, or should we always assume 
+            // TODO: Do we want to allow the user to specify which push environment they want to use, or should we always assume
             //       live? If so, the below will need updating with a new setting.
-            const bool useDevEnvironment = false; 
+            const bool useDevEnvironment = false;
             capManager.AddPushNotifications(useDevEnvironment);
-            
+
             capManager.WriteToFile();
         }
 
@@ -65,10 +65,10 @@ namespace Unity.Services.PushNotifications.Editor
             string plistPath = projectPath + "/Info.plist";
             PlistDocument plist = new PlistDocument();
             plist.ReadFromFile(plistPath);
-       
-            PlistElementArray existingBackgroundModes = (PlistElementArray) plist.root["UIBackgroundModes"] ?? plist.root.CreateArray("UIBackgroundModes");
+
+            PlistElementArray existingBackgroundModes = (PlistElementArray)plist.root["UIBackgroundModes"] ?? plist.root.CreateArray("UIBackgroundModes");
             existingBackgroundModes.AddString("remote-notification");
-            
+
             plist.WriteToFile(plistPath);
         }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Unity.Services.PushNotifications
 {
-    public class PushNotificationCoreInitialization : IInitializablePackage
+    class PushNotificationCoreInitialization : IInitializablePackage
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void Register()

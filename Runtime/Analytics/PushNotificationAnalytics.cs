@@ -7,16 +7,10 @@ namespace Unity.Services.PushNotifications
     static class SdkVersion
     {
         // This value should always match what is in the package.json for this package
-        public static readonly string SDK_VERSION = "2.0.0-pre.2";
+        public static readonly string SDK_VERSION = "3.0.0-pre.1";
     }
 
-    interface IPushNotificationsAnalytics
-    {
-        void RecordPushTokenUpdated(string pushToken);
-        void RecordNotificationOpened(Dictionary<string, object> payload, bool didLaunch);
-    }
-
-    public class PushNotificationAnalytics: IPushNotificationsAnalytics
+    class PushNotificationAnalytics : IPushNotificationsAnalytics
     {
         IPushNotificationEventsWrapper m_EventsWrapper;
         IPushNotificationAnalyticsPlatformWrapper m_AnalyticsPlatformWrapper;
@@ -76,27 +70,32 @@ namespace Unity.Services.PushNotifications
 
             bool insertCommunicationAttrs = false;
 
-            if (payload.ContainsKey("_ddCampaign")) {
+            if (payload.ContainsKey("_ddCampaign"))
+            {
                 eventParams["campaignId"] = Convert.ToInt64(payload["_ddCampaign"]);
                 insertCommunicationAttrs = true;
             }
-            if (payload.ContainsKey("_ddCohort")) {
+            if (payload.ContainsKey("_ddCohort"))
+            {
                 eventParams["cohortId"] = Convert.ToInt64(payload["_ddCohort"]);
                 insertCommunicationAttrs = true;
             }
-            if (insertCommunicationAttrs && payload.ContainsKey("_ddCommunicationSender")) {
+            if (insertCommunicationAttrs && payload.ContainsKey("_ddCommunicationSender"))
+            {
                 eventParams["communicationSender"] = payload["_ddCommunicationSender"];
                 eventParams["communicationState"] = "OPEN";
             }
 
-            if (didLaunch) {
+            if (didLaunch)
+            {
                 eventParams["notificationLaunch"] = true;
             }
             if (payload.ContainsKey("_ddId"))
             {
                 eventParams["notificationId"] = Convert.ToInt64(payload["_ddId"]);
             }
-            if (payload.ContainsKey("_ddName")) {
+            if (payload.ContainsKey("_ddName"))
+            {
                 eventParams["notificationName"] = payload["_ddName"];
             }
             eventParams["communicationState"] = "OPEN";

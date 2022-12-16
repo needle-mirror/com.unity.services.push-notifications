@@ -4,6 +4,41 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [3.0.0-pre.1] - 2022-12-16
+
+### Fixed
+Fixed a bug preventing the `notificationOpened` event from being sent after opening a notification while the app was fully closed
+
+### Changes
+
+- The following classes have been changed to `internal`:
+  - `InsertPushNotificationDependenciesIntoGradleScript`
+  - `IOSRichPushNotificationPostProcess`
+  - `IOSBasicPushNotificationPostProcess`
+  - `PushSettingsProvider`
+  - `PushNotificationEditorGameService`
+  - `PushNotificationAnalytics`
+- Moved `IPushNotificationsAnalytics` to it's own file.
+- Change `PushNotificationsService` to use the `IPushNotificationsAnalytics` interface instead of 
+directly using the `PushNotificationsAnalytics` class.
+- Bumped the Analytics SDK version from `4.0.0-pre.2` to `4.3.0`
+- Bumped the Core Package SDK version from `1.2.0` to `1.4.0`
+- Dashboard project link now available in settings panel
+- Renamed the following fields in `PushNotificationSettings` (Values will be retained):
+  - `androidApiKey` -> `firebaseWebApiKey`
+  - `androidSenderId` -> `firebaseProjectNumber`
+  - `androidApplicationId` -> `firebaseAppID`
+  - `androidProjectId` -> `firebaseProjectID`
+
+### Removed
+- Removed the deprecated `PushNotifications` class.
+- Removed obsolete `PushNotificationSettings` properties.
+
+### Known Issues
+- Notifications received while the app is opened will automatically trigger the `notificationOpened` event even before they are opened
+- `didLaunch` property sent with `notificationOpened` event not fully accurate
+- Devices running Android 13 will not receive notifications until the player grants permission. Permission won’t be requested until the device receives a notification for the first time.
+
 ## [2.0.0-pre.2] - 2022-05-09
 
 ### Fixed

@@ -1,4 +1,5 @@
 using Unity.Services.Core.Editor;
+using Unity.Services.Core.Editor.OrganizationHandler;
 using UnityEditor;
 
 namespace Unity.Services.PushNotifications.Editor
@@ -8,13 +9,23 @@ namespace Unity.Services.PushNotifications.Editor
         public string GetKey() => "Push Notifications";
     }
 
-    public class PushNotificationEditorGameService : IEditorGameService
+    internal class PushNotificationEditorGameService : IEditorGameService
     {
         static readonly PushNotificationIdentifier k_Identifier = new PushNotificationIdentifier();
 
         public string GetFormattedDashboardUrl()
         {
-            return null;
+            string organizationId = OrganizationProvider.Organization.Key;
+            string projectId = CloudProjectSettings.projectId;
+
+            bool isProjectConfigured = !string.IsNullOrEmpty(organizationId) && !string.IsNullOrEmpty(projectId);
+
+            if (isProjectConfigured)
+            {
+                return $"https://dashboard.unity3d.com/organizations/{organizationId}/projects/{projectId}/environments/default/campaigns/push/overview";
+            }
+
+            return "https://dashboard.unity3d.com";
         }
 
         public string Name => "Push Notifications";

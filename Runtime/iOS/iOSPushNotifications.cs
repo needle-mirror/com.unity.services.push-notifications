@@ -12,6 +12,9 @@ namespace Unity.Services.PushNotifications
         static TaskCompletionSource<string> s_DeviceRegistrationTcs;
         static string s_DeviceToken;
 
+        static PushNotificationReceivedHandler s_NotificationReceivedHandler;
+        static PushNotificationAnalytics s_NotificationAnalytics;
+
         internal static event Action<Dictionary<string, object>> InternalNotificationWasReceived;
 
         delegate void NotificationRegistrationCallback(string deviceToken);
@@ -25,6 +28,12 @@ namespace Unity.Services.PushNotifications
         [DllImport("__Internal")]
         static extern void RegisterUnityCallbackForNotificationReceived(NotificationReceivedCallback callback);
 
+        [DllImport("__Internal")]
+        static internal extern string GetLaunchedNotificationString();
+
+        [DllImport("__Internal")]
+        static internal extern void ResetLaunchedNotificationString();
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         internal static void PerformLaunchActions()
         {
@@ -32,6 +41,24 @@ namespace Unity.Services.PushNotifications
         }
 
 #endif
+        public IOSPushNotifications(PushNotificationReceivedHandler notificationReceivedHandler, PushNotificationAnalytics analytics)
+        {
+            s_NotificationReceivedHandler = notificationReceivedHandler;
+            s_NotificationAnalytics = analytics;
+
+            #if UNITY_IOS && !UNITY_EDITOR
+                string launchedNotificationString = GetLaunchedNotificationString();
+
+                if (launchedNotificationString != null)
+                {
+                    Debug.Log("App launched from notification, sending relevant events");
+                    NotificationReceived(launchedNotificationString);
+
+                    // remove launched notificationData so it cannot be re-processed
+                    ResetLaunchedNotificationString();
+                }
+            #endif
+        }
 
         /// <summary>
         /// Registers for push notifications on iOS. Returns the device token for the registered device.
@@ -77,7 +104,7 @@ namespace Unity.Services.PushNotifications
                 {
                     s_DeviceToken = token;
                     s_DeviceRegistrationTcs.TrySetResult(token);
-                    PushNotificationsService.internalInstance.Analytics.RecordPushTokenUpdated(token);
+                    s_NotificationAnalytics.RecordPushTokenUpdated(token);
                     Debug.Log($"Successfully registered for remote push notifications with token: {token}");
                 }
 
@@ -94,7 +121,7 @@ namespace Unity.Services.PushNotifications
                 return;
             }
 
-            Dictionary<string, object> userInfo = PushNotificationsService.internalInstance.notificationReceivedHandler.HandleReceivedNotification(serialisedNotificationData);
+            Dictionary<string, object> userInfo = s_NotificationReceivedHandler.HandleReceivedNotification(serialisedNotificationData);
             InternalNotificationWasReceived?.Invoke(userInfo);
         }
     }

@@ -1,13 +1,17 @@
 using System.Collections.Generic;
 using Unity.Services.Core.Editor;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Unity.Services.PushNotifications.Editor
 {
-    public class PushSettingsProvider : EditorGameServiceSettingsProvider
+    internal class PushSettingsProvider : EditorGameServiceSettingsProvider
     {
         const string k_Title = "Push Notifications";
+        const string k_GoToDashboardContainer = "dashboard-button-container";
+        const string k_GoToDashboardBtn = "dashboard-link-button";
+
 
         protected override IEditorGameService EditorGameService => k_GameService;
         protected override string Title => k_Title;
@@ -24,18 +28,24 @@ namespace Unity.Services.PushNotifications.Editor
 
             VisualElement containerVisualElement = new VisualElement();
 
-            Label headerLabel = new Label("Android");
+            Label headerLabel = new Label("Android (Firebase) Settings");
             headerLabel.style.fontSize = 14;
             headerLabel.style.unityFontStyleAndWeight = UnityEngine.FontStyle.Bold;
             headerLabel.style.marginLeft = 4;
             containerVisualElement.Add(headerLabel);
 
-            CreateFormRow("API Key", nameof(PushNotificationSettings.androidApiKey), serializedSettings, containerVisualElement);
-            CreateFormRow("Sender ID", nameof(PushNotificationSettings.androidSenderId), serializedSettings, containerVisualElement);
-            CreateFormRow("Application ID", nameof(PushNotificationSettings.androidApplicationId), serializedSettings, containerVisualElement);
-            CreateFormRow("Project ID", nameof(PushNotificationSettings.androidProjectId), serializedSettings, containerVisualElement);
+            CreateFormRow("Firebase Web API Key", nameof(PushNotificationSettings.firebaseWebApiKey), serializedSettings, containerVisualElement);
+            CreateFormRow("Firebase Project Number", nameof(PushNotificationSettings.firebaseProjectNumber), serializedSettings, containerVisualElement);
+            CreateFormRow("Firebase App ID", nameof(PushNotificationSettings.firebaseAppID), serializedSettings, containerVisualElement);
+            CreateFormRow("Firebase Project ID", nameof(PushNotificationSettings.firebaseProjectID), serializedSettings, containerVisualElement);
 
             return containerVisualElement;
+        }
+
+        public override void OnActivate(string searchContext, VisualElement rootElement)
+        {
+            base.OnActivate(searchContext, rootElement);
+            SetDashboardButton(rootElement);
         }
 
         protected override VisualElement GenerateUnsupportedDetailUI()
@@ -75,6 +85,21 @@ namespace Unity.Services.PushNotifications.Editor
             rowContainer.Add(textField);
 
             container.Add(rowContainer);
+        }
+
+        static void SetDashboardButton(VisualElement rootElement)
+        {
+            rootElement.Q(k_GoToDashboardContainer).style.display = DisplayStyle.Flex;
+            var goToDashboard = rootElement.Q(k_GoToDashboardBtn);
+
+            if (goToDashboard != null)
+            {
+                var clickable = new Clickable(() =>
+                {
+                    Application.OpenURL(k_GameService.GetFormattedDashboardUrl());
+                });
+                goToDashboard.AddManipulator(clickable);
+            }
         }
 
         static SerializedObject GetSerializedSettings()

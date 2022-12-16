@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Unity.Services.PushNotifications.Editor
 {
-    public class InsertPushNotificationDependenciesIntoGradleScript : IPostGenerateGradleAndroidProject
+    internal class InsertPushNotificationDependenciesIntoGradleScript : IPostGenerateGradleAndroidProject
     {
         public int callbackOrder => 0;
 

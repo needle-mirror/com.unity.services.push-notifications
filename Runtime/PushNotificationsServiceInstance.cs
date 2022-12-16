@@ -24,7 +24,7 @@ namespace Unity.Services.PushNotifications
             notificationReceivedHandler = new PushNotificationReceivedHandler(m_PushNotificationAnalyticsImpl, m_AnalyticsPlatformWrapper);
 
 #if UNITY_IOS
-            m_IOSPushNotifications = new IOSPushNotifications();
+            m_IOSPushNotifications = new IOSPushNotifications(notificationReceivedHandler, m_PushNotificationAnalyticsImpl);
 #elif UNITY_ANDROID
             m_AndroidPushNotifications = new AndroidPushNotifications(notificationReceivedHandler, m_PushNotificationAnalyticsImpl);
 #endif
@@ -46,7 +46,7 @@ namespace Unity.Services.PushNotifications
 #endif
         }
 
-        public PushNotificationAnalytics Analytics => m_PushNotificationAnalyticsImpl;
+        public IPushNotificationsAnalytics Analytics => m_PushNotificationAnalyticsImpl;
 
         /// <summary>
         /// Registers for push notifications with the appropriate mechanism for the current platform.
@@ -66,11 +66,11 @@ namespace Unity.Services.PushNotifications
 #if UNITY_IOS
             return m_IOSPushNotifications.RegisterForPushNotificationsAsync();
 #elif UNITY_ANDROID
-            if (string.IsNullOrEmpty(settings.androidApiKey) || string.IsNullOrEmpty(settings.androidApplicationId) || string.IsNullOrEmpty(settings.androidSenderId) || string.IsNullOrEmpty(settings.androidProjectId))
+            if (string.IsNullOrEmpty(settings.firebaseWebApiKey) || string.IsNullOrEmpty(settings.firebaseAppID) || string.IsNullOrEmpty(settings.firebaseProjectNumber) || string.IsNullOrEmpty(settings.firebaseProjectID))
             {
                 throw new Exception("UGS Push Notifications is missing Android settings - make sure these are set in the editor Project Settings");
             }
-            return m_AndroidPushNotifications.RegisterForPushNotificationsAsync(settings.androidApiKey, settings.androidSenderId, settings.androidApplicationId, settings.androidProjectId);
+            return m_AndroidPushNotifications.RegisterForPushNotificationsAsync(settings.firebaseWebApiKey, settings.firebaseProjectNumber, settings.firebaseAppID, settings.firebaseProjectID);
 #else
             Debug.Log("Push notifications are not supported on this platform at this time, returning an empty push token");
             return Task.FromResult("");

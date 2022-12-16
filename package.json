@@ -1,12 +1,24 @@
 {
   "name": "com.unity.services.push-notifications",
   "displayName": "Push Notifications",
-  "version": "2.0.0-pre.2",
+  "version": "3.0.0-pre.1",
   "unity": "2020.3",
+  "_upm": {
+    "gameService": {
+      "projectDashboardUrl": "https://dashboard.unity3d.com/organizations/{0}/projects/{1}/environments/default/campaigns/push/overview",
+      "projectDashboardUrlType": "OrganizationKeyAndProjectGuid",
+      "groupId": "player-engagement",
+      "configurePath": "Project/Services/Push Notifications"
+    },
+    "supportedPlatforms": [
+      "Android",
+      "iOS"
+    ]
+  },
   "description": "This package adds support for Push Notifications to your game. It allows sending rich push notifications with images, and provides analytics on the number of received push notifications.",
   "dependencies": {
-    "com.unity.services.analytics": "4.0.0-pre.2",
-    "com.unity.services.core": "1.2.0"
+    "com.unity.services.analytics": "4.3.0",
+    "com.unity.services.core": "1.4.0"
   },
   "samples": [
     {
@@ -15,15 +27,15 @@
       "path": "Samples~/Example"
     }
   ],
-  "_upm": {
-    "changelog": "### Fixed\n\n* Fixed a documentation bug\n* Fixed a compile issue that could occur if custom Editor classes were added to a Unity project"
+  "relatedPackages": {
+    "com.unity.services.push-notifications.tests": "3.0.0-pre.1"
   },
   "upmCi": {
-    "footprint": "1409906e5289dfc4474b663304f308e2e8273672"
+    "footprint": "e943bcf132ce6918035d75212779fc445e3bf0ad"
   },
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/operate-services-sdk.git",
     "type": "git",
-    "revision": "7f13c78fe742bdc29ae7884480c462f42b9d8c31"
+    "revision": "8b6b19bdf39a89e8de25e989aa60ff6f1dc791d1"
   }
 }

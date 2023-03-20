@@ -3,6 +3,7 @@ using System.IO;
 using UnityEditor;
 using UnityEditor.Android;
 using UnityEngine;
+using Unity.Services.PushNotifications.Editor;
 
 namespace Unity.Services.PushNotifications.Editor
 {
@@ -12,19 +13,20 @@ namespace Unity.Services.PushNotifications.Editor
 
         const string k_GradleDependencyOpeningTag = "dependencies {";
 
-        readonly Dictionary<string, string> m_Dependencies = new Dictionary<string, string>
-        {
-            {"com.google.firebase:firebase-messaging-ktx", "22.0.0"}
-        };
+        //Dependency list is managed from the PushNotificationDependencyHandler class.
+        readonly Dictionary<string, string> k_Dependencies = PushNotificationsDependencyHandler.k_Dependencies;
 
         public void OnPostGenerateGradleAndroidProject(string path)
         {
+            //If EDM4U or MDR is installed, let them take over instead.
+            if (PushNotificationsDependencyHandler.IsPlayServicesResolverInstalled()) return;
+
             string libraryBuildGradlePath = Path.Combine(path, "build.gradle");
             string buildGradleFileContent = File.ReadAllText(libraryBuildGradlePath);
 
             string dependencyString = "";
 
-            foreach (var keyValuePair in m_Dependencies)
+            foreach (var keyValuePair in k_Dependencies)
             {
                 string library = keyValuePair.Key;
                 string version = keyValuePair.Value;

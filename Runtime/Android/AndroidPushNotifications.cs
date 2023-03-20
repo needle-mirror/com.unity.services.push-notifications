@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Android;
 
 namespace Unity.Services.PushNotifications
 {
-    class AndroidPushNotifications: AndroidJavaProxy
+    class AndroidPushNotifications : AndroidJavaProxy
     {
         static object s_RegistrationLock = new object();
         static TaskCompletionSource<string> s_DeviceRegistrationTcs;
@@ -15,6 +16,10 @@ namespace Unity.Services.PushNotifications
         PushNotificationAnalytics m_NotificationAnalytics;
 
         AndroidJavaObject m_IntentExtras;
+
+        const string k_AndroidNotificationPermissionName = "android.permission.POST_NOTIFICATIONS";
+        const string k_PlayerPrefPermissionDenied = "NotificationPermissionRequested";
+        const int k_TiramisuVersionNumber = 33;
 
         public AndroidPushNotifications(PushNotificationReceivedHandler notificationReceivedHandler, PushNotificationAnalytics analytics)
             : base("com.unity.services.pushnotifications.android.UnityCallbackClass")
@@ -60,18 +65,47 @@ namespace Unity.Services.PushNotifications
 
                 s_DeviceRegistrationTcs = new TaskCompletionSource<string>();
 
-                try
+                void InitializePushNotifications()
                 {
-                    AndroidJavaObject applicationContext = GetCurrentActivity().Call<AndroidJavaObject>("getApplicationContext");
+                    try
+                    {
+                        AndroidJavaObject applicationContext = GetCurrentActivity().Call<AndroidJavaObject>("getApplicationContext");
 
-                    AndroidJavaObject instance = GetPluginInstance();
-                    instance.Call("setCallbackClass", this);
-                    instance.Call("initialize", applicationContext,
-                        firebaseApiKey, firebaseApplicationId, firebaseSenderId, firebaseProjectId);
+                        AndroidJavaObject instance = GetPluginInstance();
+                        instance.Call("setCallbackClass", this);
+                        instance.Call("initialize", applicationContext,
+                            firebaseApiKey, firebaseApplicationId, firebaseSenderId, firebaseProjectId);
+                    }
+                    catch (Exception e)
+                    {
+                        s_DeviceRegistrationTcs.TrySetException(new Exception($"Failed to initialize Push Notification plugin instance and register the device for remote notifications"));
+                    }
                 }
-                catch (Exception e)
+
+                bool isPermissionAuthorized = Permission.HasUserAuthorizedPermission(k_AndroidNotificationPermissionName);
+                AndroidJavaClass version = new AndroidJavaClass("android.os.Build$VERSION");
+                int sdkVersion = version.GetStatic<int>("SDK_INT");
+
+                if (sdkVersion <  k_TiramisuVersionNumber || isPermissionAuthorized)
                 {
-                    s_DeviceRegistrationTcs.TrySetException(new Exception($"Failed to initialize Push Notification plugin instance and register the device for remote notifications"));
+                    InitializePushNotifications();
+                }
+                else
+                {
+                    bool hasPermissionBeenDenied = Convert.ToBoolean(PlayerPrefs.GetInt(k_PlayerPrefPermissionDenied));
+
+                    if (!hasPermissionBeenDenied)
+                    {
+                        var callbacks = new PermissionCallbacks();
+                        callbacks.PermissionGranted += _ => InitializePushNotifications();
+                        callbacks.PermissionDenied += _ =>
+                        {
+                            PlayerPrefs.SetInt(k_PlayerPrefPermissionDenied, 1);
+                            PlayerPrefs.Save();
+                        };
+
+                        Permission.RequestUserPermission(k_AndroidNotificationPermissionName, callbacks);
+                    }
                 }
 
                 return s_DeviceRegistrationTcs.Task;
@@ -147,4 +181,3 @@ namespace Unity.Services.PushNotifications
         }
     }
 }
-

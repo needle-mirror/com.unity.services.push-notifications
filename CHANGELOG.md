@@ -4,6 +4,18 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [3.0.1-pre.1] - 2023-03-20
+
+### Fixed
+
+- Android SDK Level 33 (Tiramisu) support now available.
+  - Added necessary post notification permission to manifest.
+  - Package will now ask for permission during initialization if required.
+- External Dependency Manager for Unity (EDM4U) and Mobile Dependency Resolver (MDR) support now available. When either is installed:
+  - A new `PushSDKDependencies.xml` file is generated for them to use.
+  - `InsertPushNotificationDependenciesIntoGradleScript` will not run to prevent duplication from gradle.
+- Fixed errors appearing in the Editor Play Mode due to platform specific classes instantiating.
+
 ## [3.0.0-pre.1] - 2022-12-16
 
 ### Fixed

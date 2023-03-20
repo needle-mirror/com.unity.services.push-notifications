@@ -11,9 +11,9 @@ namespace Unity.Services.PushNotifications
         PushNotificationAnalytics m_PushNotificationAnalyticsImpl;
         internal PushNotificationReceivedHandler notificationReceivedHandler;
 
-#if UNITY_IOS
+#if UNITY_IOS && !UNITY_EDITOR
         IOSPushNotifications m_IOSPushNotifications;
-#elif UNITY_ANDROID
+#elif UNITY_ANDROID && !UNITY_EDITOR
         AndroidPushNotifications m_AndroidPushNotifications;
 #endif
 
@@ -23,19 +23,19 @@ namespace Unity.Services.PushNotifications
             m_PushNotificationAnalyticsImpl = new PushNotificationAnalytics(new EventsWrapper(), m_AnalyticsPlatformWrapper);
             notificationReceivedHandler = new PushNotificationReceivedHandler(m_PushNotificationAnalyticsImpl, m_AnalyticsPlatformWrapper);
 
-#if UNITY_IOS
+#if UNITY_IOS && !UNITY_EDITOR
             m_IOSPushNotifications = new IOSPushNotifications(notificationReceivedHandler, m_PushNotificationAnalyticsImpl);
-#elif UNITY_ANDROID
+#elif UNITY_ANDROID && !UNITY_EDITOR
             m_AndroidPushNotifications = new AndroidPushNotifications(notificationReceivedHandler, m_PushNotificationAnalyticsImpl);
 #endif
         }
 
         public event Action<Dictionary<string, object>> OnNotificationReceived
         {
-#if UNITY_IOS
+#if UNITY_IOS && !UNITY_EDITOR
             add => IOSPushNotifications.InternalNotificationWasReceived += value;
             remove => IOSPushNotifications.InternalNotificationWasReceived -= value;
-#elif UNITY_ANDROID
+#elif UNITY_ANDROID && !UNITY_EDITOR
             add => m_AndroidPushNotifications.InternalNotificationWasReceived += value;
             remove => m_AndroidPushNotifications.InternalNotificationWasReceived -= value;
 #else
@@ -63,16 +63,19 @@ namespace Unity.Services.PushNotifications
 
         Task<string> RegisterForPushNotificationsInternal(PushNotificationSettings settings)
         {
-#if UNITY_IOS
+#if UNITY_IOS && !UNITY_EDITOR
             return m_IOSPushNotifications.RegisterForPushNotificationsAsync();
-#elif UNITY_ANDROID
+#elif UNITY_ANDROID && !UNITY_EDITOR
             if (string.IsNullOrEmpty(settings.firebaseWebApiKey) || string.IsNullOrEmpty(settings.firebaseAppID) || string.IsNullOrEmpty(settings.firebaseProjectNumber) || string.IsNullOrEmpty(settings.firebaseProjectID))
             {
                 throw new Exception("UGS Push Notifications is missing Android settings - make sure these are set in the editor Project Settings");
             }
             return m_AndroidPushNotifications.RegisterForPushNotificationsAsync(settings.firebaseWebApiKey, settings.firebaseProjectNumber, settings.firebaseAppID, settings.firebaseProjectID);
+#elif UNITY_EDITOR
+            Debug.Log("Push Notifications are not supported in the Editor Play mode. Returning an empty push token.");
+            return Task.FromResult("");
 #else
-            Debug.Log("Push notifications are not supported on this platform at this time, returning an empty push token");
+            Debug.Log("Push notifications are not supported on this platform at this time. Returning an empty push token.");
             return Task.FromResult("");
 #endif
         }

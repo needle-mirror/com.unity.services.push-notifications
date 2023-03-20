@@ -9,5 +9,6 @@ namespace Unity.Services.PushNotifications
         public event Action<Dictionary<string, object>> OnNotificationReceived;
         public IPushNotificationsAnalytics Analytics { get; }
         public Task<string> RegisterForPushNotificationsAsync();
+
     }
 }

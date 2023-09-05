@@ -1,21 +1,18 @@
-using System;
-using Unity.Services.Analytics.Internal;
 using UnityEngine;
 
 namespace Unity.Services.PushNotifications
 {
-    interface IPushNotificationAnalyticsPlatformWrapper
+    interface ISystemWrapper
     {
         string ApplicationVersion();
         RuntimePlatform RuntimePlatform();
         bool IsApplicationFocused();
-        string AnalyticsPlatform();
+
+        PushNotificationSettings GetSettings();
     }
-    
-    class PushNotificationsAnalyticsPlatformWrapper: IPushNotificationAnalyticsPlatformWrapper
+
+    class SystemWrapper : ISystemWrapper
     {
-        const string k_UnknownCountryCode = "ZZ";
-        
         public string ApplicationVersion()
         {
             return Application.version;
@@ -31,15 +28,9 @@ namespace Unity.Services.PushNotifications
             return Application.isFocused;
         }
 
-        public string AnalyticsPlatform()
+        public PushNotificationSettings GetSettings()
         {
-#if UNITY_IOS
-            return "IOS";
-#elif UNITY_ANDROID
-            return "ANDROID";            
-#else
-            return "UNKNOWN";
-#endif
+            return PushNotificationSettings.GetAssetInstance();
         }
     }
 }

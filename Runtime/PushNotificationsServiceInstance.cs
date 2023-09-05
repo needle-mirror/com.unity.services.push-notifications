@@ -5,79 +5,113 @@ using UnityEngine;
 
 namespace Unity.Services.PushNotifications
 {
-    class PushNotificationsServiceInstance : IPushNotificationsService
+    internal interface IPushPlatformCallbacks
     {
-        PushNotificationsAnalyticsPlatformWrapper m_AnalyticsPlatformWrapper;
-        PushNotificationAnalytics m_PushNotificationAnalyticsImpl;
-        internal PushNotificationReceivedHandler notificationReceivedHandler;
+        void RemoteNotificationReceived(Dictionary<string, object> notificationData);
+    }
 
-#if UNITY_IOS && !UNITY_EDITOR
-        IOSPushNotifications m_IOSPushNotifications;
-#elif UNITY_ANDROID && !UNITY_EDITOR
-        AndroidPushNotifications m_AndroidPushNotifications;
-#endif
+    internal class PushNotificationsServiceInstance : IPushNotificationsService, IPushPlatformCallbacks
+    {
+        string m_DeviceToken;
 
-        internal PushNotificationsServiceInstance()
+        readonly IPushAnalytics m_Analytics;
+        readonly IPushPlatform m_PlatformLogic;
+        readonly ISystemWrapper m_PlatformWrapper;
+        readonly IMainThreadHelper m_MainThreadHelper;
+
+        [Obsolete("Do not use this. It will be deleted in a future version. Notification events are recorded for you automatically.")]
+        public IPushNotificationsAnalytics Analytics { get { return new PushNotificationsAnalyticsStub(m_Analytics); } }
+
+        internal PushNotificationsServiceInstance(
+            IPushAnalytics analytics,
+            IPushPlatform platformSpecificLogic,
+            ISystemWrapper platformWrapper,
+            IMainThreadHelper mainThreadHelper)
         {
-            m_AnalyticsPlatformWrapper = new PushNotificationsAnalyticsPlatformWrapper();
-            m_PushNotificationAnalyticsImpl = new PushNotificationAnalytics(new EventsWrapper(), m_AnalyticsPlatformWrapper);
-            notificationReceivedHandler = new PushNotificationReceivedHandler(m_PushNotificationAnalyticsImpl, m_AnalyticsPlatformWrapper);
-
-#if UNITY_IOS && !UNITY_EDITOR
-            m_IOSPushNotifications = new IOSPushNotifications(notificationReceivedHandler, m_PushNotificationAnalyticsImpl);
-#elif UNITY_ANDROID && !UNITY_EDITOR
-            m_AndroidPushNotifications = new AndroidPushNotifications(notificationReceivedHandler, m_PushNotificationAnalyticsImpl);
-#endif
+            m_Analytics = analytics;
+            m_PlatformLogic = platformSpecificLogic;
+            m_PlatformWrapper = platformWrapper;
+            m_MainThreadHelper = mainThreadHelper;
         }
 
-        public event Action<Dictionary<string, object>> OnNotificationReceived
+        event Action<Dictionary<string, object>> m_NotificationReceivedEvent;
+        public event Action<Dictionary<string, object>> OnRemoteNotificationReceived
         {
-#if UNITY_IOS && !UNITY_EDITOR
-            add => IOSPushNotifications.InternalNotificationWasReceived += value;
-            remove => IOSPushNotifications.InternalNotificationWasReceived -= value;
-#elif UNITY_ANDROID && !UNITY_EDITOR
-            add => m_AndroidPushNotifications.InternalNotificationWasReceived += value;
-            remove => m_AndroidPushNotifications.InternalNotificationWasReceived -= value;
-#else
             add
-            { /* No action on unsupported platforms */ }
-            remove
-            { /* No action on unsupported platforms */ }
-#endif
-        }
-
-        public IPushNotificationsAnalytics Analytics => m_PushNotificationAnalyticsImpl;
-
-        /// <summary>
-        /// Registers for push notifications with the appropriate mechanism for the current platform.
-        ///
-        /// This method will automatically handle platform specific intricacies of getting a push notification token, and will
-        /// send the appropriate analytics events to Unity Analytics 2.
-        /// </summary>
-        /// <returns>(Asynchronously via a Task) The device token as a string.</returns>
-        public Task<string> RegisterForPushNotificationsAsync()
-        {
-            PushNotificationSettings settings = PushNotificationSettings.GetAssetInstance();
-            return RegisterForPushNotificationsInternal(settings);
-        }
-
-        Task<string> RegisterForPushNotificationsInternal(PushNotificationSettings settings)
-        {
-#if UNITY_IOS && !UNITY_EDITOR
-            return m_IOSPushNotifications.RegisterForPushNotificationsAsync();
-#elif UNITY_ANDROID && !UNITY_EDITOR
-            if (string.IsNullOrEmpty(settings.firebaseWebApiKey) || string.IsNullOrEmpty(settings.firebaseAppID) || string.IsNullOrEmpty(settings.firebaseProjectNumber) || string.IsNullOrEmpty(settings.firebaseProjectID))
             {
-                throw new Exception("UGS Push Notifications is missing Android settings - make sure these are set in the editor Project Settings");
+                if (String.IsNullOrEmpty(m_DeviceToken))
+                {
+                    m_NotificationReceivedEvent += value;
+                }
+                else
+                {
+                    throw new InvalidOperationException("You may not subscribe to OnRemoteNotificationReceived after calling RegisterForPushNotificationsAsync.");
+                }
             }
-            return m_AndroidPushNotifications.RegisterForPushNotificationsAsync(settings.firebaseWebApiKey, settings.firebaseProjectNumber, settings.firebaseAppID, settings.firebaseProjectID);
-#elif UNITY_EDITOR
-            Debug.Log("Push Notifications are not supported in the Editor Play mode. Returning an empty push token.");
-            return Task.FromResult("");
-#else
-            Debug.Log("Push notifications are not supported on this platform at this time. Returning an empty push token.");
-            return Task.FromResult("");
-#endif
+            remove => m_NotificationReceivedEvent -= value;
+        }
+
+        public async Task<string> RegisterForPushNotificationsAsync()
+        {
+            if (String.IsNullOrEmpty(m_DeviceToken))
+            {
+                PushNotificationSettings settings = m_PlatformWrapper.GetSettings();
+
+                m_DeviceToken = await m_PlatformLogic.RegisterForPushNotifications(settings);
+                if (String.IsNullOrEmpty(m_DeviceToken))
+                {
+                    throw new Exception("Failed to register the device for remote notifications.");
+                }
+                else
+                {
+                    // The underlying platform logic includes interop callbacks, so there's no guarantee we're back where we started.
+                    // Therefore: force this bit onto the main thread so that we can use Unity APIs again.
+                    m_MainThreadHelper.RunOnMainThread(CompleteRegistration);
+                }
+            }
+
+            return m_DeviceToken;
+        }
+
+        void CompleteRegistration()
+        {
+            Debug.Log($"DeviceToken = {m_DeviceToken}");
+
+            m_Analytics.RecordPushTokenUpdated(m_DeviceToken);
+
+            Dictionary<string, object> launchNotification = m_PlatformLogic.CheckForAppLaunchByNotification();
+            if (launchNotification != null)
+            {
+                m_Analytics.RecordNotificationOpened(launchNotification, true);
+                m_NotificationReceivedEvent?.Invoke(launchNotification);
+            }
+        }
+
+        internal void OnApplicationPause(bool isPaused)
+        {
+            m_PlatformLogic.OnApplicationPause(isPaused);
+        }
+
+        public void RemoteNotificationReceived(Dictionary<string, object> notificationData)
+        {
+            // Once again, this is invoked by underlying platform logic so there's no guarantee it's on the main thread.
+            // Therefore: enforce it.
+            m_MainThreadHelper.RunOnMainThread(() =>
+            {
+                ProcessRemoteNotification(notificationData);
+            });
+        }
+
+        void ProcessRemoteNotification(Dictionary<string, object> notificationData)
+        {
+            if (notificationData != null)
+            {
+                // If the application is in the background then we want to send the relevant analytics.
+                // (Note: This doesn't 100% guarantee that we're launching from an event, but it matches the previous deltaDNA behavior).
+                m_Analytics.RecordNotificationOpened(notificationData, !m_PlatformWrapper.IsApplicationFocused());
+            }
+
+            m_NotificationReceivedEvent?.Invoke(notificationData);
         }
     }
 }

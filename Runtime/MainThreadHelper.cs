@@ -6,27 +6,27 @@ using UnityEngine;
 
 namespace Unity.Services.PushNotifications
 {
-    static class MainThreadHelper
+    interface IMainThreadHelper
+    {
+        void RunOnMainThread(Action methodToRun);
+    }
+
+    class MainThreadHelper : IMainThreadHelper
     {
         static SynchronizationContext s_UnitySynchronizationContext;
         static TaskScheduler s_TaskScheduler;
         static int s_MainThreadId;
 
-#if UNITY_EDITOR
-        [InitializeOnLoadMethod]
-#endif
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Init()
+        public MainThreadHelper()
         {
             s_UnitySynchronizationContext = SynchronizationContext.Current;
             s_TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             s_MainThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 
-        internal static async void RunOnMainThread(Action methodToRun)
+        public void RunOnMainThread(Action methodToRun)
         {
-            await Task.Factory.StartNew(methodToRun, CancellationToken.None, TaskCreationOptions.None,
-                s_TaskScheduler);
+            Task.Factory.StartNew(methodToRun, CancellationToken.None, TaskCreationOptions.None, s_TaskScheduler);
         }
     }
 }

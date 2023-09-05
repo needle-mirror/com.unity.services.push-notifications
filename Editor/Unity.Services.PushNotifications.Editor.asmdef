@@ -4,7 +4,9 @@
       "Unity.Services.PushNotifications",
       "Unity.Services.Core",
       "Unity.Services.Core.Internal",
-      "Unity.Services.Core.Editor"
+      "Unity.Services.Core.Editor",
+      "Unity.Notifications.iOS",
+      "Unity.Notifications.Android"
     ],
     "includePlatforms": [
         "Editor"

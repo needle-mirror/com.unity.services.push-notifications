@@ -3,7 +3,7 @@
 // make sure the XML doc file is present and located next to the scraped dll
 namespace Unity.Services.PushNotifications
 {
-    public interface IPushNotificationsAnalytics
+    [System.Obsolete(@"This interface should not be used. It will be deleted in the future version. Notification events are recorded for you automatically.")] public interface IPushNotificationsAnalytics
     {
         public void RecordNotificationOpened(System.Collections.Generic.Dictionary<string, object> payload, bool didLaunch);
         public void RecordPushTokenUpdated(string pushToken);
@@ -11,8 +11,8 @@ namespace Unity.Services.PushNotifications
 
     public interface IPushNotificationsService
     {
-        public event System.Action<System.Collections.Generic.Dictionary<string, object>> OnNotificationReceived;
-        public IPushNotificationsAnalytics Analytics { get; }
+        public event System.Action<System.Collections.Generic.Dictionary<string, object>> OnRemoteNotificationReceived;
+        [System.Obsolete(@"Do not use this. It will be removed in a future version. Events are recorded for you automatically.")] public IPushNotificationsAnalytics Analytics { get; }
         public System.Threading.Tasks.Task<string> RegisterForPushNotificationsAsync();
     }
 

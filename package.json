@@ -1,7 +1,7 @@
 {
   "name": "com.unity.services.push-notifications",
   "displayName": "Push Notifications",
-  "version": "3.0.1-pre.1",
+  "version": "4.0.0-pre.1",
   "unity": "2020.3",
   "_upm": {
     "gameService": {
@@ -14,12 +14,13 @@
       "Android",
       "iOS"
     ],
-    "changelog": "### Fixed\n\n- Android SDK Level 33 (Tiramisu) support now available.\n  - Added necessary post notification permission to manifest.\n  - Package will now ask for permission during initialization if required.\n- External Dependency Manager for Unity (EDM4U) and Mobile Dependency Resolver (MDR) support now available. When either is installed:\n  - A new `PushSDKDependencies.xml` file is generated for them to use.\n  - `InsertPushNotificationDependenciesIntoGradleScript` will not run to prevent duplication from gradle.\n- Fixed errors appearing in the Editor Play Mode due to platform specific classes instantiating."
+    "changelog": "### Changed\n\n- You can now only subscribe to OnNotificationReceived before calling RegisterForPushNotificationsAsync\n  - Once RegisterForPushNotificationsAsync completes, OnNotificationReceived will be invoked if the app was launched from a remote notification\n- Updated `com.unity.services.analytics` dependency to 5.0.0\n- Updated `com.unity.services.core` dependency to 1.10.1\n- Added `com.unity.mobile.notifications` version `2.2.0` as a dependency.\n\n### Fixed\n\n- Behaviour when the app is launched from a push notification is now consistent between iOS and Android (incoming push notification data is broadcast after RegisterForPushNotificationsAsync flow is complete)"
   },
   "description": "This package adds support for Push Notifications to your game. It allows sending rich push notifications with images, and provides analytics on the number of received push notifications.",
   "dependencies": {
-    "com.unity.services.analytics": "4.3.0",
-    "com.unity.services.core": "1.4.0"
+    "com.unity.services.analytics": "5.0.0",
+    "com.unity.services.core": "1.10.1",
+    "com.unity.mobile.notifications": "2.2.0"
   },
   "samples": [
     {
@@ -29,15 +30,15 @@
     }
   ],
   "relatedPackages": {
-    "com.unity.services.push-notifications.tests": "3.0.1-pre.1"
+    "com.unity.services.push-notifications.tests": "4.0.0-pre.1"
   },
   "upmCi": {
-    "footprint": "927a49827610e91ab8c814bbc2e5b1574dd90449"
+    "footprint": "054068a89710c104e87a975345d09a133468fb0c"
   },
-  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.services.push-notifications@3.0/manual/index.html",
+  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.services.push-notifications@4.0/manual/index.html",
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/operate-services-sdk.git",
     "type": "git",
-    "revision": "3805a41b5e29d7f30e70323b4bacd1a93335a8bb"
+    "revision": "90d4a9809f94049ed1b036b44dcdba044f530efd"
   }
 }

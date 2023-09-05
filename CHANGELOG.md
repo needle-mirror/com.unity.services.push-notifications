@@ -4,6 +4,27 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [4.0.0-pre.1] - 2023-09-05
+
+### Changed
+
+- You can now only subscribe to OnNotificationReceived before calling RegisterForPushNotificationsAsync
+  - Once RegisterForPushNotificationsAsync completes, OnNotificationReceived will be invoked if the app was launched from a remote notification
+- Updated `com.unity.services.analytics` dependency to 5.0.0
+- Updated `com.unity.services.core` dependency to 1.10.1
+- Added `com.unity.mobile.notifications` version `2.2.0` as a dependency.
+
+### Fixed
+
+- Behaviour when the app is launched from a push notification is now consistent between iOS and Android (incoming push notification data is broadcast after RegisterForPushNotificationsAsync flow is complete)
+
+## [3.0.1-pre.2] - 2023-08-15
+
+### Fixed
+
+- Bug fix for PushNotificationsService's OnNotificationReceived not being called on IOS
+- Bug fix where RegisterForPushNotificationsAsync is stuck when the user disables notification settings.
+
 ## [3.0.1-pre.1] - 2023-03-20
 
 ### Fixed

@@ -1,7 +1,7 @@
 {
   "name": "com.unity.services.push-notifications",
   "displayName": "Push Notifications",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "unity": "2021.3",
   "_upm": {
     "gameService": {
@@ -14,7 +14,7 @@
       "Android",
       "iOS"
     ],
-    "changelog": "### Changed\n\n- Bumps the unity version to 2021.3\n- Updated `com.unity.services.analytics` dependency to 6.0.1"
+    "changelog": "### Changed\n- Bug fix associated with the `registerForPushNotificationsAsync` method hanging for Android devices in some cases."
   },
   "description": "This package adds support for Push Notifications to your game. It allows sending rich push notifications with images, and provides analytics on the number of received push notifications.",
   "dependencies": {
@@ -30,15 +30,15 @@
     }
   ],
   "relatedPackages": {
-    "com.unity.services.push-notifications.tests": "4.0.0"
+    "com.unity.services.push-notifications.tests": "4.0.1"
   },
   "upmCi": {
-    "footprint": "af8df0834b2b91b5e123cc826be53e8020d8f3d6"
+    "footprint": "c37f049cf68483ae743a4782992c45f60c5441d3"
   },
   "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.services.push-notifications@4.0/manual/index.html",
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/operate-services-sdk.git",
     "type": "git",
-    "revision": "50b23cb45b26b142133375a4d22e504fd2707203"
+    "revision": "7d105ba1603a3370df040d31623257840cb44525"
   }
 }

@@ -33,9 +33,14 @@ namespace Unity.Services.PushNotifications
         /// <returns>The push notification token for this device</returns>
         public Task<string> RegisterForPushNotifications(PushNotificationSettings settings)
         {
-            // NOTE: Settings is only required by Android, but is taken to ensure a consistent interface
-
+            // Check if a Task exists before re instantiating a new TaskCompletionSource
+            if (s_RegisterTcSource != null)
+            {
+                return s_RegisterTcSource.Task;
+            }
             s_RegisterTcSource = new TaskCompletionSource<string>();
+
+            // NOTE: Settings is only required by Android, but is taken to ensure a consistent interface
             m_Container.StartCoroutine(RequestAuthorization(AuthorizationOption.Alert | AuthorizationOption.Badge | AuthorizationOption.Sound));
             return s_RegisterTcSource.Task;
         }
@@ -49,13 +54,20 @@ namespace Unity.Services.PushNotifications
                     yield return null;
                 }
 
+                if (s_RegisterTcSource == null)
+                {
+                    yield return null;
+                }
+
                 if (request.Granted)
                 {
                     s_RegisterTcSource.TrySetResult(request.DeviceToken);
+					s_RegisterTcSource = null;
                 }
                 else
                 {
                     s_RegisterTcSource.TrySetException(new Exception("Authorization request was denied"));
+					s_RegisterTcSource = null;
                 }
             }
         }

@@ -3,10 +3,24 @@ using System.Collections.Generic;
 
 namespace Unity.Services.PushNotifications
 {
+	/// <summary>
+	/// This interface is no longer required. Notification events are recorded for you automatically when you register for push notifications
+	/// using RegisterForPushNotificationsAsync.
+	/// </summary>
     [Obsolete("This interface should not be used. It will be deleted in the future version. Notification events are recorded for you automatically.")]
     public interface IPushNotificationsAnalytics
     {
+        /// <summary>
+        /// RecordPushTokenUpdated is no longer required. Notification events are recorded for you automatically when you register for push notifications using <see cref="RegisterForPushNotificationsAsync"/>.
+        /// </summary>
+        /// <param name="pushToken">Please use the RegisterForPushNotificationsAsync method</param>
         void RecordPushTokenUpdated(string pushToken);
+
+        /// <summary>
+        /// RecordNotificationOpened is no longer required. Notification events are recorded for you automatically when you register for push notifications using <see cref="RegisterForPushNotificationsAsync"/>.
+        /// </summary>
+		/// <param name="payload">Please use the RegisterForPushNotificationsAsync method</param>
+		/// <param name="didLaunch">Please use the RegisterForPushNotificationsAsync method</param>
         void RecordNotificationOpened(Dictionary<string, object> payload, bool didLaunch);
     }
 

@@ -19,13 +19,29 @@ namespace Unity.Services.PushNotifications
         internal const string assetDirectory = resourcesContainer + "/" + resourcesDirectory;
         internal const string fullAssetPath = assetDirectory + "/" + settingsAssetName + ".asset";
 
+		/// <summary>
+		/// The API key for a Firebase project to be used for Android's Firebase Cloud Messaging API.
+		/// This can be found in your Firebase dashboard.
+		/// </summary>
         [Header("Android (Firebase) Settings")]
         [FormerlySerializedAs("androidApiKey")]
         public string firebaseWebApiKey;
+
+		/// <summary>
+		/// The sender ID to be used for Android's Firebase Cloud Messaging. This can be found in your Firebase dashboard.
+		/// </summary>
         [FormerlySerializedAs("androidSenderId")]
         public string firebaseProjectNumber;
+
+		/// <summary>
+		/// The application ID for a Firebase application to be used for Android's Firebase Cloud Messaging API. This can be found in your Firebase dashboard.
+		/// </summary>
         [FormerlySerializedAs("androidApplicationId")]
         public string firebaseAppID;
+
+		/// <summary>
+		/// The project ID for a Firebase project to be used for Android's Firebase Cloud Messaging API. This can be found in your Firebase dashboard.
+		/// </summary>
         [FormerlySerializedAs("androidProjectId")]
         public string firebaseProjectID;
 

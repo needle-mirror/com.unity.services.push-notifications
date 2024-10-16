@@ -1,11 +1,14 @@
+using System;
 using Unity.Services.Core.Editor;
 using Unity.Services.Core.Editor.OrganizationHandler;
 using UnityEditor;
 
 namespace Unity.Services.PushNotifications.Editor
 {
+	[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
     public struct PushNotificationIdentifier : IEditorGameServiceIdentifier
     {
+		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public string GetKey() => "Push Notifications";
     }
 

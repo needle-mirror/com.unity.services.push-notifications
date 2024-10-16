@@ -19,6 +19,9 @@ namespace Unity.Services.PushNotifications
         readonly ISystemWrapper m_PlatformWrapper;
         readonly IMainThreadHelper m_MainThreadHelper;
 
+        /// <summary>
+        /// This is no longer required. Notification events are recorded for you automatically when you register for push notifications using RegisterForPushNotificationsAsync.
+        /// </summary>
         [Obsolete("Do not use this. It will be deleted in a future version. Notification events are recorded for you automatically.")]
         public IPushNotificationsAnalytics Analytics { get { return new PushNotificationsAnalyticsStub(m_Analytics); } }
 

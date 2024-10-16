@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace Unity.Services.PushNotifications
 {
+    /// <summary>
+    /// Interface representing a collection of methods to interact with the Push Notifications service.
+    /// </summary>
     public interface IPushNotificationsService
     {
         /// <summary>
@@ -16,6 +19,10 @@ namespace Unity.Services.PushNotifications
         /// </summary>
         public event Action<Dictionary<string, object>> OnRemoteNotificationReceived;
 
+		/// <summary>
+		/// This is no longer required. Notification events are recorded for you automatically when you register for push notifications
+		/// using <see cref="RegisterForPushNotificationsAsync"/>.
+		/// </summary>
         [Obsolete("Do not use this. It will be removed in a future version. Events are recorded for you automatically.")]
         public IPushNotificationsAnalytics Analytics { get; }
 

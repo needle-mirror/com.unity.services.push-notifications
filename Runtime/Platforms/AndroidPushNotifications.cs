@@ -49,6 +49,13 @@ namespace Unity.Services.PushNotifications
         /// <returns>The push notification token for this device</returns>
         public Task<string> RegisterForPushNotifications(PushNotificationSettings settings)
         {
+            // Check if a Task exists before re instantiating a new TaskCompletionSource
+            if (s_RegisterTcSource != null)
+            {
+                return s_RegisterTcSource.Task;
+            }
+            s_RegisterTcSource = new TaskCompletionSource<string>();
+
             if (String.IsNullOrEmpty(settings.firebaseWebApiKey) ||
                 String.IsNullOrEmpty(settings.firebaseAppID) ||
                 String.IsNullOrEmpty(settings.firebaseProjectNumber) ||
@@ -57,7 +64,6 @@ namespace Unity.Services.PushNotifications
                 throw new Exception("UGS Push Notifications is missing Android settings - make sure these are set in the editor Project Settings");
             }
 
-            s_RegisterTcSource = new TaskCompletionSource<string>();
             m_Container.StartCoroutine(
                 RequestAuthorization(
                     settings.firebaseWebApiKey,
@@ -76,6 +82,11 @@ namespace Unity.Services.PushNotifications
                 yield return null;
             }
 
+            if (s_RegisterTcSource == null)
+            {
+                yield return null;
+            }
+
             switch (request.Status)
             {
                 case PermissionStatus.Allowed:
@@ -84,6 +95,7 @@ namespace Unity.Services.PushNotifications
                 case PermissionStatus.Denied:
                 case PermissionStatus.DeniedDontAskAgain:
                     s_RegisterTcSource.TrySetException(new Exception($"Authorization request was denied"));
+                    s_RegisterTcSource = null;
                     break;
             }
         }
@@ -106,7 +118,12 @@ namespace Unity.Services.PushNotifications
             }
             catch (Exception e)
             {
+                if (s_RegisterTcSource == null)
+                {
+                    return;
+                }
                 s_RegisterTcSource.TrySetException(new Exception($"Failed to initialize Push Notification Plugin {e.Message}"));
+                s_RegisterTcSource = null;
             }
         }
 
@@ -138,6 +155,7 @@ namespace Unity.Services.PushNotifications
         void OnTokenReceived(string token)
         {
             s_RegisterTcSource.TrySetResult(token);
+            s_RegisterTcSource = null;
         }
 
         // Implementing the UnityRemoteNotificationsCallback from the Plugin
